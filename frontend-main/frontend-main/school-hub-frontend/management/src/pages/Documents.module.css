@@ -1,0 +1,57 @@
+.categoryPills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+
+.pill {
+  padding: 6px 16px; border-radius: 20px;
+  background: var(--white); border: 1.5px solid var(--border);
+  font-size: 13px; font-weight: 500; color: var(--ink-muted);
+  cursor: pointer; transition: all var(--transition);
+}
+
+.pill:hover   { border-color: var(--accent); color: var(--accent); }
+.pillActive   { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 700; }
+
+.tableHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+}
+.tableTitle { font-size: 14px; font-weight: 700; }
+.tableSub   { font-size: 12px; color: var(--ink-muted); }
+
+.cardTitle { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.cardSub   { font-size: 13px; color: var(--ink-muted); margin-bottom: 20px; }
+
+/* Upload form */
+.uploadCard { margin-bottom: 20px; }
+
+.uploadHead {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+
+.uploadGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 600px) { .uploadGrid { grid-template-columns: 1fr; } }
+
+.uploadActions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+
+/* Report cards */
+.reportGrid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+
+@media (max-width: 1000px) { .reportGrid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .reportGrid { grid-template-columns: 1fr; } }
+
+.reportCard {
+  background: var(--surface); border-radius: var(--radius-md);
+  padding: 16px 14px; border: 1.5px solid var(--border);
+  transition: border-color var(--transition);
+}
+
+.reportCard:hover { border-color: var(--accent); }
+
+.reportIcon  { font-size: 24px; margin-bottom: 8px; }
+.reportLabel { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.reportFormat{ font-size: 11px; color: var(--ink-muted); margin-bottom: 4px; }
+
+.reportApi { font-size: 10px; color: var(--ink-muted); }
+.reportApi code { font-size: 10px; background: var(--surface2); padding: 1px 5px; border-radius: 4px; }

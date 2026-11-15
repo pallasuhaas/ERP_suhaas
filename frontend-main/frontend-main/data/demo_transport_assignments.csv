@@ -1,0 +1,24 @@
+admission_number,route_name,pickup_point,drop_point,effective_from,transport_fee
+DPS2024001,Route 1,Koramangala Bus Stop,School Main Gate,2024-06-01,1200
+DPS2024002,Route 1,Koramangala Bus Stop,School Main Gate,2024-06-01,1200
+DPS2024003,Route 1,Koramangala Bus Stop,School Main Gate,2024-06-01,1200
+DPS2024004,Route 2,Indiranagar 100ft Road,School Side Gate,2024-06-01,1400
+DPS2024005,Route 2,Indiranagar 100ft Road,School Side Gate,2024-06-01,1400
+DPS2024006,Route 1,HSR Layout Sector 2,School Main Gate,2024-06-01,1200
+DPS2024007,Route 3,Whitefield Main Road,School Back Gate,2024-06-01,1800
+DPS2024009,Route 1,BTM Layout 2nd Stage,School Main Gate,2024-06-01,1200
+DPS2024010,Route 1,BTM Layout 2nd Stage,School Main Gate,2024-06-01,1200
+DPS2024012,Route 2,Domlur Bus Stop,School Side Gate,2024-06-01,1400
+DPS2024013,Route 1,Koramangala 4th Block,School Main Gate,2024-06-01,1200
+DPS2024015,Route 2,Indiranagar CMH Road,School Side Gate,2024-06-01,1400
+DPS2024016,Route 2,Indiranagar CMH Road,School Side Gate,2024-06-01,1400
+DPS2024017,Route 1,HSR Layout 27th Main,School Main Gate,2024-06-01,1200
+DPS2024019,Route 3,Whitefield ITPL Road,School Back Gate,2024-06-01,1800
+DPS2024021,Route 2,Domlur 2nd Stage,School Side Gate,2024-06-01,1400
+DPS2024022,Route 2,Domlur 2nd Stage,School Side Gate,2024-06-01,1400
+DPS2024023,Route 3,Whitefield Hope Farm,School Back Gate,2024-06-01,1800
+DPS2024025,Route 1,Koramangala 6th Block,School Main Gate,2024-06-01,1200
+DPS2024027,Route 3,Whitefield Kadugodi,School Back Gate,2024-06-01,1800
+DPS2024031,Route 3,Whitefield Main Road,School Back Gate,2024-06-01,1800
+DPS2024039,Route 1,BTM Layout 1st Stage,School Main Gate,2024-06-01,1200
+DPS2024041,Route 3,Whitefield Hope Farm,School Back Gate,2024-06-01,1800

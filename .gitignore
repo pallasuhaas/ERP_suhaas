@@ -1,0 +1,12 @@
+﻿*.zip
+.claude/
+node_modules/
+.env
+.env.*
+target/
+dist/
+build/
+.idea/
+.vscode/
+*.log
+.DS_Store

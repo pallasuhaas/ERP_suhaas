@@ -1,0 +1,28 @@
+# Backend microservice repos — maintained separately under vidya-verse; not part of this repo
+student-info-service/
+payment-service/
+transport-service/
+notification-service/
+school-hub/
+school-hub-erp-infra/
+
+# Dependencies & build output
+**/node_modules/
+**/dist/
+**/target/
+**/.vite/
+
+# Secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# OS & IDE
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Nested clone metadata (kept locally, not pushed)
+**/.git/
+**/.git_backup/

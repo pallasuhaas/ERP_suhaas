@@ -1,0 +1,36 @@
+package com.studenthub.payment_service.data.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "discount_policy")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class DiscountPolicy {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "discount_id")
+    private Long discountId;
+
+    @Column(name = "name", nullable = false, length = 100)
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "criteria", nullable = false, length = 20)
+    private DiscountCriteria criteria;
+
+    @Column(name = "discount_percentage", nullable = false)
+    private Double discountPercentage;
+
+    @Column(name = "valid_from", nullable = false)
+    private LocalDate validFrom;
+
+    @Column(name = "valid_to", nullable = false)
+    private LocalDate validTo;
+}

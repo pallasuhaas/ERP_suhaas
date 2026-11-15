@@ -1,0 +1,101 @@
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) { .statsGrid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px)  { .statsGrid { grid-template-columns: repeat(2, 1fr); } }
+
+.statCard { transition: transform var(--transition); }
+.statCard:hover { transform: translateY(-2px); }
+
+.statTop { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+
+.statIcon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.icon_green  { background: var(--green-light); }
+.icon_orange { background: var(--orange-light); }
+.icon_blue   { background: var(--blue-light); }
+.icon_red    { background: var(--red-light); }
+.icon_teal   { background: var(--teal-light); }
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) { .twoCol { grid-template-columns: 1fr; } }
+
+.activityCard { max-height: 500px; overflow: hidden; display: flex; flex-direction: column; }
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.cardTitle { font-size: 15px; font-weight: 700; }
+.cardSub   { font-size: 12px; color: var(--ink-muted); }
+
+.activityList { overflow-y: auto; flex: 1; }
+
+.activityRow {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.activityRow:last-child { border-bottom: none; }
+
+.actIcon {
+  width: 32px; height: 32px;
+  border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+}
+
+.act_fee       { background: var(--green-light); }
+.act_transport { background: var(--teal-light); }
+.act_ticket    { background: var(--orange-light); }
+.act_student   { background: var(--blue-light); }
+.act_alert     { background: var(--red-light); }
+
+.actText { flex: 1; font-size: 13px; line-height: 1.4; color: var(--ink-soft); }
+.actTime { font-size: 11px; color: var(--ink-muted); white-space: nowrap; flex-shrink: 0; }
+
+.rightCol { display: flex; flex-direction: column; }
+
+.quickGrid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+
+.quickCard {
+  background: var(--surface); border-radius: var(--radius-md);
+  padding: 14px 12px; text-align: left; border: none; cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.quickCard:hover { background: var(--surface2); transform: translateY(-1px); }
+
+.quickIcon { font-size: 22px; margin-bottom: 6px; }
+.quickLabel { font-size: 13px; font-weight: 700; color: var(--ink); }
+.quickSub   { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+
+.busRow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--border);
+}
+
+.busRow:last-child { border-bottom: none; }
+.busRoute  { font-size: 13px; font-weight: 600; }
+.busDriver { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }

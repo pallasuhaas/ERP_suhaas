@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SchoolConnect</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F7FAFC;
+    color: #0D171C;
+    min-height: 100vh;
+  }
+
+  /* ── Login ── */
+  #login-page {
+    position: fixed;
+    inset: 0;
+    background: #F7FAFC;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 40px 24px;
+  }
+
+  #login-page.hidden { display: none; }
+
+  .login-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 40px;
+  }
+
+  .login-logo { font-size: 18px; font-weight: 700; color: #0D171C; }
+
+  .login-help {
+    width: 32px; height: 32px;
+    border: 1.5px solid #0D171C;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    color: #0D171C;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .login-title { font-size: 28px; font-weight: 700; text-align: center; margin-bottom: 12px; }
+  .login-sub { font-size: 16px; color: #0D171C; text-align: center; line-height: 1.5; margin-bottom: 32px; }
+
+  .input-field {
+    width: 100%;
+    background: #E8F0F2;
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #4D8099;
+    outline: none;
+    margin-bottom: 16px;
+  }
+
+  .input-field::placeholder { color: #4D8099; }
+  .input-field:focus { background: #dce8ec; }
+
+  .forgot { font-size: 14px; color: #4D8099; text-align: center; margin-bottom: 24px; cursor: pointer; }
+
+  .btn-primary {
+    width: 100%;
+    background: #12A3ED;
+    color: #F7FAFC;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+
+  .or-text { font-size: 14px; color: #4D8099; text-align: center; margin-bottom: 16px; }
+
+  .social-row { display: flex; gap: 12px; width: 100%; margin-bottom: 24px; }
+
+  .social-btn {
+    flex: 1;
+    background: #E8F0F2;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0D171C;
+    cursor: pointer;
+  }
+
+  .signup-text { font-size: 14px; color: #4D8099; text-align: center; }
+  .signup-text a { color: #4D8099; font-weight: 600; }
+
+  /* ── App Shell ── */
+  #app { display: none; flex-direction: row; min-height: 100vh; }
+  #app.visible { display: flex; }
+
+  /* ── Sidebar ── */
+  aside {
+    width: 220px;
+    background: #ffffff;
+    border-right: 1px solid #E8F0F2;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    position: fixed;
+    top: 0; bottom: 0; left: 0;
+  }
+
+  .sidebar-logo {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0D171C;
+    padding: 0 20px 24px;
+    border-bottom: 1px solid #E8F0F2;
+    margin-bottom: 16px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4D8099;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover { color: #0D171C; background: #F7FAFC; }
+
+  .nav-item.active {
+    color: #12A3ED;
+    border-left-color: #12A3ED;
+    background: #F0F9FF;
+    font-weight: 600;
+  }
+
+  .nav-item svg { flex-shrink: 0; }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px 20px;
+    border-top: 1px solid #E8F0F2;
+  }
+
+  .child-pill {
+    background: #E8F0F2;
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .child-pill-label { font-size: 11px; color: #4D8099; margin-bottom: 2px; }
+  .child-pill-name { font-size: 14px; font-weight: 700; color: #0D171C; }
+  .child-pill-class { font-size: 12px; color: #4D8099; }
+
+  /* ── Main ── */
+  main {
+    margin-left: 220px;
+    flex: 1;
+    padding: 40px 48px;
+    max-width: 860px;
+  }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Page header ── */
+  .page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+  }
+
+  .page-head-title { font-size: 22px; font-weight: 700; }
+
+  /* ── Section title ── */
+  .section-title { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+
+  /* ── Dashboard ── */
+  .dash-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .dash-card-label { font-size: 13px; color: #4D8099; margin-bottom: 4px; font-weight: 500; }
+  .dash-card-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .dash-card-sub { font-size: 14px; color: #12A3ED; margin-bottom: 16px; }
+
+  .btn-secondary {
+    background: #E8F0F2;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0D171C;
+    cursor: pointer;
+  }
+
+  .dash-img {
+    width: 100px; height: 100px;
+    border-radius: 10px;
+    background: #F0E8E0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    flex-shrink: 0;
+  }
+
+  .dash-img.bus { background: #E8F0F2; }
+
+  .dash-quick {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .dash-quick .btn-blue { background: #12A3ED; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .dash-quick .btn-secondary { padding: 10px 20px; }
+
+  /* ── Finance ── */
+  .fee-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid #F7FAFC;
+  }
+
+  .fee-item:last-child { border-bottom: none; }
+
+  .fee-name { font-size: 16px; font-weight: 600; color: #0D171C; }
+  .fee-due { font-size: 14px; color: #4D8099; margin-top: 2px; }
+  .fee-amount { font-size: 16px; font-weight: 600; }
+
+  .section-block {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+
+  .payment-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #F7FAFC;
+    cursor: pointer;
+    font-size: 16px;
+    color: #0D171C;
+  }
+
+  .payment-option:last-of-type { border-bottom: none; }
+
+  .pay-icon {
+    width: 44px; height: 44px;
+    background: #E8F0F2;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: #0D171C;
+  }
+
+  .hist-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #F7FAFC;
+  }
+
+  .hist-item:last-child { border-bottom: none; }
+  .hist-name { font-size: 16px; font-weight: 600; }
+  .hist-date { font-size: 13px; color: #12A3ED; margin-top: 2px; }
+  .hist-amount { font-size: 16px; font-weight: 600; }
+
+  .btn-pay {
+    width: 100%;
+    background: #12A3ED;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 16px;
+  }
+
+  /* ── Transport ── */
+  .map-box {
+    background: linear-gradient(135deg, #c8e8c8 0%, #b8dbd8 50%, #b0d8e8 100%);
+    border-radius: 12px;
+    height: 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .map-search {
+    position: absolute;
+    top: 16px; left: 16px; right: 72px;
+    background: white;
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #4D8099;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .map-zoom {
+    position: absolute;
+    right: 16px; top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .zoom-btn {
+    width: 36px; height: 36px;
+    background: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+
+  .stop-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #F7FAFC;
+  }
+
+  .stop-item:last-of-type { border-bottom: none; }
+
+  .stop-icon {
+    width: 44px; height: 44px;
+    background: #E8F0F2;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #4D8099;
+    flex-shrink: 0;
+  }
+
+  .stop-name { font-size: 16px; font-weight: 600; }
+  .stop-eta { font-size: 14px; color: #4D8099; margin-top: 2px; }
+
+  .transport-alert {
+    font-size: 14px;
+    color: #12A3ED;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  /* ── Notifications ── */
+  .notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid #F7FAFC;
+  }
+
+  .notif-item:last-child { border-bottom: none; }
+
+  .notif-icon {
+    width: 44px; height: 44px;
+    background: #E8F0F2;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #0D171C;
+    flex-shrink: 0;
+  }
+
+  .notif-title { font-size: 15px; font-weight: 600; color: #0D171C; }
+  .notif-sub { font-size: 14px; color: #4D8099; margin-top: 2px; }
+
+  /* ── Settings ── */
+  .settings-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid #F7FAFC;
+    cursor: pointer;
+  }
+
+  .settings-item:last-child { border-bottom: none; }
+
+  .settings-icon {
+    width: 44px; height: 44px;
+    background: #E8F0F2;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #0D171C;
+    flex-shrink: 0;
+  }
+
+  .settings-label { font-size: 15px; font-weight: 600; color: #0D171C; }
+  .settings-desc { font-size: 14px; color: #4D8099; margin-top: 2px; }
+  .settings-arrow { margin-left: auto; color: #4D8099; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="login-header">
+    <div class="login-logo">SchoolConnect</div>
+    <div class="login-help">?</div>
+  </div>
+  <div class="login-box">
+    <h1 class="login-title">Welcome Back</h1>
+    <p class="login-sub">Sign in to manage your child's school finances and transport.</p>
+    <input class="input-field" type="email" placeholder="Email">
+    <input class="input-field" type="password" placeholder="Password">
+    <div class="forgot">Forgot Password?</div>
+    <button class="btn-primary" onclick="document.getElementById('login-page').classList.add('hidden');document.getElementById('app').classList.add('visible')">Sign In</button>
+    <div class="or-text">Or sign in with</div>
+    <div class="social-row">
+      <button class="social-btn">Google</button>
+      <button class="social-btn">Apple</button>
+    </div>
+    <div class="signup-text"><a href="#">Don't have an account? Sign Up</a></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <aside>
+    <div class="sidebar-logo">SchoolConnect</div>
+    <div class="nav-item active" onclick="nav('dashboard')" id="nav-dashboard">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="nav('finance')" id="nav-finance">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Finance
+    </div>
+    <div class="nav-item" onclick="nav('transport')" id="nav-transport">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      Transport
+    </div>
+    <div class="nav-item" onclick="nav('notifications')" id="nav-notifications">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Notifications
+    </div>
+    <div class="nav-item" onclick="nav('settings')" id="nav-settings">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </div>
+    <div class="sidebar-bottom">
+      <div class="child-pill">
+        <div class="child-pill-label">Student</div>
+        <div class="child-pill-name">Emma Parker</div>
+        <div class="child-pill-class">Grade 5 · Bus Route 1</div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-head">
+        <div class="page-head-title">Hello, Sophia</div>
+        <svg width="22" height="22" fill="none" stroke="#4D8099" stroke-width="2" viewBox="0 0 24 24" style="cursor:pointer" onclick="nav('settings')"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+      <div class="dash-card">
+        <div>
+          <div class="dash-card-label">Fees</div>
+          <div class="dash-card-title">Upcoming Payment</div>
+          <div class="dash-card-sub">Due on 15th July</div>
+          <button class="btn-secondary" onclick="nav('finance')">View Details</button>
+        </div>
+        <div class="dash-img">📅</div>
+      </div>
+      <div class="dash-card">
+        <div>
+          <div class="dash-card-label">Transport</div>
+          <div class="dash-card-title">Vehicle Status</div>
+          <div class="dash-card-sub">On the way</div>
+          <button class="btn-secondary" onclick="nav('transport')">Track</button>
+        </div>
+        <div class="dash-img bus">🚌</div>
+      </div>
+      <div class="dash-quick">
+        <button class="btn-blue" onclick="nav('finance')">Finance</button>
+        <button class="btn-secondary" onclick="nav('transport')">Transport</button>
+      </div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="page" id="page-finance">
+      <div class="page-head">
+        <div class="page-head-title">Finance</div>
+      </div>
+
+      <!-- Next Due Summary Card -->
+      <div class="section-block due-summary" id="due-summary" onclick="toggleBreakup()" style="cursor:pointer;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div style="font-size:13px; color:#4D8099; margin-bottom:4px; font-weight:500;">Next Due</div>
+            <div style="font-size:13px; color:#4D8099;">January 15, 2024</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:32px; font-weight:700; color:#0D171C;">$670</div>
+            <div style="font-size:13px; color:#12A3ED; margin-top:2px; display:flex; align-items:center; gap:4px; justify-content:flex-end;">
+              View breakup
+              <svg id="breakup-arrow" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition:transform 0.25s;"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Breakup (hidden by default) -->
+        <div id="fee-breakup" style="display:none; margin-top:16px; border-top:1px solid #F7FAFC; padding-top:4px;">
+          <div class="fee-item">
+            <div><div class="fee-name">Tuition Fee</div><div class="fee-due">Monthly academic fee</div></div>
+            <div class="fee-amount">$500</div>
+          </div>
+          <div class="fee-item">
+            <div><div class="fee-name">Transport Fee</div><div class="fee-due">Bus Route 1</div></div>
+            <div class="fee-amount">$100</div>
+          </div>
+          <div class="fee-item">
+            <div><div class="fee-name">Activity Fee</div><div class="fee-due">Extracurriculars</div></div>
+            <div class="fee-amount">$50</div>
+          </div>
+          <div class="fee-item" style="border-bottom:none;">
+            <div><div class="fee-name">Library Fee</div><div class="fee-due">Annual library access</div></div>
+            <div class="fee-amount">$20</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Options -->
+      <div class="section-block">
+        <div class="section-title">Payment Options</div>
+        <div class="payment-option">
+          <div class="pay-icon">₹</div>
+          UPI
+        </div>
+        <div class="payment-option">
+          <div class="pay-icon">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          </div>
+          Credit/Debit Card
+        </div>
+        <div class="payment-option">
+          <div class="pay-icon">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          Net Banking
+        </div>
+        <button class="btn-pay">Pay Now</button>
+      </div>
+
+      <!-- Payment History -->
+      <div class="section-block">
+        <div class="section-title">Payment History</div>
+        <div class="hist-item">
+          <div><div class="hist-name">Tuition Fee</div><div class="hist-date">12/15/2023</div></div>
+          <div class="hist-amount">$500</div>
+        </div>
+        <div class="hist-item">
+          <div><div class="hist-name">Transport Fee</div><div class="hist-date">12/15/2023</div></div>
+          <div class="hist-amount">$100</div>
+        </div>
+        <div class="hist-item">
+          <div><div class="hist-name">Activity Fee</div><div class="hist-date">12/15/2023</div></div>
+          <div class="hist-amount">$50</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSPORT -->
+    <div class="page" id="page-transport">
+      <div class="page-head">
+        <div class="page-head-title">School Bus Tracker</div>
+      </div>
+      <div class="map-box">
+        <div class="map-search">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Search for a stop
+        </div>
+        <div class="map-zoom">
+          <button class="zoom-btn">+</button>
+          <button class="zoom-btn">−</button>
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-title">Bus 7 – Route 1</div>
+        <div class="stop-item">
+          <div class="stop-icon">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <div class="stop-name">Next Stop: Elm Street</div>
+            <div class="stop-eta">Estimated arrival: 8:15 AM</div>
+          </div>
+        </div>
+        <div class="stop-item">
+          <div class="stop-icon">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <div class="stop-name">Your Stop: Oak Avenue</div>
+            <div class="stop-eta">Estimated arrival: 8:25 AM</div>
+          </div>
+        </div>
+        <div class="transport-alert">Alert: Bus is running 5 minutes behind schedule due to traffic.</div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div class="page-head">
+        <div class="page-head-title">Notifications</div>
+      </div>
+      <div class="section-block">
+        <div class="notif-item">
+          <div class="notif-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div><div class="notif-title">Tuition Fee Reminder</div><div class="notif-sub">Fees due in 3 days</div></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div><div class="notif-title">Payment Confirmation</div><div class="notif-sub">Payment successful</div></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+          <div><div class="notif-title">Bus Pickup Notification</div><div class="notif-sub">Arriving in 5 minutes</div></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+          <div><div class="notif-title">Bus Drop-off Notification</div><div class="notif-sub">Dropped off at 3:15 PM</div></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><div class="notif-title">Bus Delay Alert</div><div class="notif-sub">Expected delay of 15 minutes</div></div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></div>
+          <div><div class="notif-title">School Announcement</div><div class="notif-sub">School closed on Monday</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="page-head">
+        <div class="page-head-title">Settings</div>
+      </div>
+      <div class="section-block">
+        <div class="section-title">Account</div>
+        <div class="settings-item">
+          <div class="settings-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div><div class="settings-label">Profile</div><div class="settings-desc">Manage your personal information</div></div>
+          <svg class="settings-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.4 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+          <div><div class="settings-label">Contact Information</div><div class="settings-desc">Update your contact details</div></div>
+          <svg class="settings-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-title">Payments</div>
+        <div class="settings-item">
+          <div class="settings-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>
+          <div><div class="settings-label">Payment Methods</div><div class="settings-desc">Add or edit payment methods</div></div>
+          <svg class="settings-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-title">Notifications</div>
+        <div class="settings-item">
+          <div class="settings-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          <div><div class="settings-label">Notification Preferences</div><div class="settings-desc">Configure your notification preferences</div></div>
+          <svg class="settings-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+      <div class="section-block">
+        <div class="section-title">Support</div>
+        <div class="settings-item">
+          <div class="settings-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <div><div class="settings-label">Help & Support</div><div class="settings-desc">Access app support or FAQs</div></div>
+          <svg class="settings-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function nav(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.getElementById('nav-' + page).classList.add('active');
+  }
+
+  function toggleBreakup() {
+    const breakup = document.getElementById('fee-breakup');
+    const arrow = document.getElementById('breakup-arrow');
+    const open = breakup.style.display === 'block';
+    breakup.style.display = open ? 'none' : 'block';
+    arrow.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+</script>
+</body>
+</html>

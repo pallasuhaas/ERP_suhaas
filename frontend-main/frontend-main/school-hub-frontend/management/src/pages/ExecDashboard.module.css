@@ -1,0 +1,118 @@
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px; margin-bottom: 24px;
+}
+
+@media (max-width: 1200px) { .kpiGrid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 700px)  { .kpiGrid { grid-template-columns: repeat(2, 1fr); } }
+
+.kpiCard { transition: transform var(--transition); cursor: default; }
+.kpiCard:hover { transform: translateY(-2px); }
+
+.kpi_purple { border-top-color: var(--accent); }
+.kpi_green  { border-top-color: var(--green); }
+.kpi_orange { border-top-color: var(--orange); }
+.kpi_blue   { border-top-color: var(--blue); }
+.kpi_teal   { border-top-color: var(--teal); }
+
+.kpiTop { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.kpiLabel { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-muted); }
+
+.kpiIcon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+
+.icon_purple { background: var(--accent-light); }
+.icon_green  { background: var(--green-light); }
+.icon_orange { background: var(--orange-light); }
+.icon_blue   { background: var(--blue-light); }
+.icon_teal   { background: var(--teal-light); }
+
+.kpiValue { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+.kpiApi   { font-size: 10px; color: var(--ink-muted); }
+.kpiApi code { font-size: 10px; background: var(--surface2); padding: 1px 5px; border-radius: 4px; }
+
+/* Charts row */
+.chartsRow {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+}
+
+@media (max-width: 1100px) { .chartsRow { grid-template-columns: 1fr; } }
+
+.chartHead { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.chartTitle { font-size: 15px; font-weight: 700; }
+.chartSub   { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+
+/* Bar chart */
+.barChartArea {
+  display: flex; gap: 8px;
+  height: 180px; align-items: flex-end;
+}
+
+.barChartAxis {
+  display: flex; flex-direction: column; justify-content: space-between;
+  height: 100%; padding-bottom: 20px;
+}
+
+.axisLabel { font-size: 10px; color: var(--ink-muted); text-align: right; white-space: nowrap; }
+
+.barChartBars {
+  flex: 1; display: flex; gap: 6px; align-items: flex-end; height: 100%;
+  border-bottom: 1.5px solid var(--border);
+  border-left: 1.5px solid var(--border);
+}
+
+.barGroup { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+.barWrap { flex: 1; width: 100%; display: flex; gap: 3px; align-items: flex-end; }
+
+.bar {
+  flex: 1; border-radius: 4px 4px 0 0;
+  transition: height 0.4s ease;
+  min-height: 2px;
+}
+
+.barTarget     { background: var(--surface2); }
+.barCollected  { background: var(--accent); opacity: 0.7; }
+
+.barLabel { font-size: 10px; color: var(--ink-muted); margin-top: 4px; }
+
+.chartLegend {
+  display: flex; align-items: center; gap: 14px; margin-top: 14px;
+  font-size: 11px; color: var(--ink-muted); flex-wrap: wrap;
+}
+
+.legendDot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.ldTarget     { background: var(--surface2); border: 1.5px solid var(--border); }
+.ldCollected  { background: var(--accent); opacity: 0.7; }
+.ldOutstanding{ background: var(--orange); opacity: 0.6; }
+
+.legendNote { margin-left: auto; font-style: italic; font-size: 10px; }
+
+/* Donut */
+.rightCol { display: flex; flex-direction: column; }
+
+.donutWrap { position: relative; width: 120px; height: 120px; margin: 0 auto 8px; }
+.donut { width: 100%; height: 100%; }
+.donutCenter {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.donutValue { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; }
+.donutSub   { font-size: 10px; color: var(--ink-muted); margin-top: 1px; }
+.progressNote { font-size: 11px; color: var(--ink-muted); text-align: center; }
+
+/* Quick nav */
+.quickRow {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  background: var(--surface); border: none; border-radius: var(--radius-sm);
+  padding: 10px 12px; margin-bottom: 6px; cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--ink); text-align: left;
+  transition: background var(--transition), color var(--transition);
+}
+.quickRow:hover { background: var(--surface2); color: var(--accent); }
+.quickArrow { margin-left: auto; font-size: 14px; opacity: 0.4; }

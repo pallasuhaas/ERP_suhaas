@@ -1,0 +1,185 @@
+.header {
+  background: var(--white);
+  padding: 20px 22px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  margin-top: 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px 8px;
+  font-size: 13px; font-weight: 600;
+  color: var(--ink-muted);
+  background: none; border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.tab.tabActive {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.body { background: var(--surface); padding-bottom: 16px; }
+
+/* Summary card */
+.summaryCard {
+  background: linear-gradient(135deg, #0f1117 0%, #1a2040 100%);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  margin: 16px 18px;
+  position: relative; overflow: hidden;
+}
+
+.summaryCard::after {
+  content: '₹';
+  position: absolute; right: -10px; top: -20px;
+  font-size: 130px; font-family: 'Fraunces', serif;
+  color: rgba(255,255,255,0.04); font-weight: 700;
+  pointer-events: none;
+}
+
+.scLabel {
+  font-size: 10px; text-transform: uppercase;
+  letter-spacing: 0.1em; color: rgba(255,255,255,0.4);
+  margin-bottom: 6px;
+}
+
+.scAmount {
+  font-family: 'Fraunces', serif;
+  font-size: 36px; font-weight: 700;
+  color: white; margin-bottom: 16px;
+}
+
+.scPills { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.pill {
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 6px 10px;
+  font-size: 10px; color: rgba(255,255,255,0.6);
+}
+
+.pill strong { display: block; font-size: 13px; color: white; font-weight: 600; }
+.pillDue { background: rgba(232,82,26,0.25); }
+
+/* Breakdown */
+.breakdown { padding: 0 18px; }
+
+.breakdownTitle {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink-muted); margin-bottom: 10px;
+}
+
+.feeItem {
+  background: var(--white);
+  border-radius: var(--radius-md); padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: var(--shadow);
+}
+
+.fiName { font-size: 13px; font-weight: 500; }
+.fiType { font-size: 10px; color: var(--ink-muted); margin-top: 2px; }
+.fiRight { text-align: right; }
+.fiAmount { font-size: 15px; font-weight: 700; }
+.fiAmount.overdue { color: var(--red); }
+
+.overdueTag {
+  display: inline-block; font-size: 9px;
+  background: var(--red-light); color: var(--red);
+  padding: 2px 7px; border-radius: 20px;
+  font-weight: 700; margin-top: 3px;
+}
+
+/* Pay bar */
+.payBar { padding: 16px 18px 8px; }
+
+.payBtn {
+  width: 100%;
+  background: var(--accent); color: white;
+  font-size: 15px; font-weight: 700;
+  padding: 16px; border-radius: var(--radius-md);
+  border: none; cursor: pointer;
+  transition: background var(--transition);
+}
+
+.payBtn:hover { background: #d44616; }
+
+.payMethods {
+  display: flex; gap: 8px;
+  justify-content: center; padding: 10px 0 4px;
+}
+
+.payTag {
+  font-size: 10px; background: var(--surface);
+  color: var(--ink-muted); padding: 4px 10px;
+  border-radius: 20px; border: 1px solid var(--border);
+}
+
+/* History */
+.historyHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px 10px;
+}
+
+.historyCount { font-size: 12px; font-weight: 600; color: var(--ink-muted); }
+.historyYear  { font-size: 11px; color: var(--ink-muted); }
+
+.histItem {
+  background: var(--white);
+  border-radius: var(--radius-md); padding: 14px 16px;
+  margin: 0 18px 8px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: var(--shadow);
+}
+
+.histItem.histFailed { border-left: 3px solid var(--red); }
+
+.histLeft { display: flex; align-items: center; gap: 12px; }
+
+.histIcon {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; flex-shrink: 0;
+}
+
+.hist_paid    { background: #e6f7ee; color: #1a8a4a; }
+.hist_pending { background: #fef3e2; color: #b45309; }
+.hist_failed  { background: var(--red-light); color: var(--red); }
+
+.histName  { font-size: 13px; font-weight: 500; }
+.histDate  { font-size: 11px; color: var(--ink-muted); margin-top: 2px; }
+
+.histRight { text-align: right; }
+.histAmount { font-size: 14px; font-weight: 700; }
+
+.histStatus {
+  font-size: 10px; font-weight: 600;
+  margin-top: 2px; text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.statusPaid    { color: #1a8a4a; }
+.statusPending { color: #b45309; }
+.statusFailed  { color: var(--red); }
+
+.receiptBtn {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 10px; font-weight: 600;
+  color: var(--accent); background: var(--accent-light);
+  border: none; border-radius: 20px;
+  padding: 3px 9px; cursor: pointer;
+  transition: background var(--transition);
+}
+
+.receiptBtn:hover { background: #ffddd0; }

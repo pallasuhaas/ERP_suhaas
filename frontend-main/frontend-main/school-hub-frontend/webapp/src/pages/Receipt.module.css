@@ -1,0 +1,90 @@
+.header {
+  background: var(--white);
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.more { margin-left: auto; font-size: 18px; opacity: 0.5; }
+
+.body {
+  background: var(--surface);
+  padding: 0 0 24px;
+}
+
+/* Receipt card */
+.card {
+  background: var(--white);
+  margin: 16px 18px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.top {
+  background: var(--ink);
+  padding: 26px 22px;
+  text-align: center;
+}
+
+.topIcon   { font-size: 36px; margin-bottom: 10px; }
+.topStatus {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 6px;
+}
+
+.topAmount {
+  font-family: 'Fraunces', serif;
+  font-size: 38px;
+  font-weight: 700;
+  color: white;
+}
+
+.cardBody { padding: 20px 22px; }
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.row:last-child { border-bottom: none; }
+
+.rowLabel { font-size: 12px; color: var(--ink-muted); }
+
+.rowValue {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+
+.rowValue.green { color: var(--teal); }
+.rowValue.mono  { font-family: monospace; font-size: 11px; }
+
+/* Download button */
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 18px;
+  width: calc(100% - 36px);
+  background: var(--surface);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+
+.downloadBtn:hover {
+  border-color: var(--ink-muted);
+  color: var(--ink);
+}

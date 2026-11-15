@@ -1,0 +1,254 @@
+.header {
+  background: var(--ink);
+  padding: 20px 22px 22px;
+}
+
+.backDark {
+  background: rgba(255,255,255,0.1) !important;
+  color: white !important;
+}
+
+.headerTitle {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
+  flex: 1;
+}
+
+.liveBadge {
+  margin-left: auto;
+  background: #e6f7ee;
+  color: #1a8a4a;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 20px;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.liveBadge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #1a8a4a;
+}
+
+/* ── Map ── */
+.mapBox {
+  background: #d4e3c9;
+  height: 210px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mapGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.road {
+  position: absolute;
+  background: white;
+  opacity: 0.8;
+}
+
+.roadH1 { height: 8px; left: 0; right: 0; top: 70px; }
+.roadH2 { height: 8px; left: 0; right: 0; top: 130px; }
+.roadV1 { width: 8px; top: 0; bottom: 0; left: 80px; }
+.roadV2 { width: 8px; top: 0; bottom: 0; left: 200px; }
+
+.routePath {
+  position: absolute;
+  top: 66px;
+  left: 70px;
+  width: 130px;
+  height: 60px;
+  border: 3px dashed rgba(232,82,26,0.5);
+  border-radius: 0 30px 0 0;
+  border-bottom: none;
+  border-left: none;
+}
+
+.busPin {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 4px 12px rgba(232,82,26,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 80px;
+  left: 140px;
+}
+
+.busPin span {
+  transform: rotate(45deg);
+  font-size: 16px;
+}
+
+.destPin {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: var(--teal);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 8px rgba(26,138,122,0.5);
+  top: 56px;
+  right: 54px;
+}
+
+/* ── Info panel ── */
+.infoPanel {
+  background: var(--white);
+  border-radius: 22px 22px 0 0;
+  margin-top: -16px;
+  padding: 22px 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.dragHandle {
+  width: 36px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 18px;
+}
+
+.etaBig {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.etaLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin-bottom: 4px;
+}
+
+.etaValue {
+  font-family: 'Fraunces', serif;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--teal);
+}
+
+.etaMins {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.delayBadge {
+  background: #fef3e2;
+  color: #b45309;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+/* Stop list */
+.stopList { margin-bottom: 16px; }
+
+.stopRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 4px 0;
+}
+
+.dotCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ink-muted);
+  flex-shrink: 0;
+}
+
+.dot.done    { background: var(--teal); }
+.dot.current {
+  background: var(--accent);
+  border: 2px solid white;
+  box-shadow: 0 0 0 3px rgba(232,82,26,0.2);
+  width: 12px;
+  height: 12px;
+}
+.dot.upcoming { background: var(--ink-muted); }
+
+.connector {
+  width: 2px;
+  height: 24px;
+  background: #e5e5e5;
+  margin: 2px 0;
+}
+
+.connDone { background: var(--teal); }
+
+.stopName   { font-size: 13px; font-weight: 500; }
+.stopCurrent { color: var(--accent); font-weight: 700 !important; }
+.stopUpcoming { color: var(--ink-muted); }
+.stopTime   { font-size: 11px; color: var(--ink-muted); margin-top: 1px; }
+
+/* Driver card */
+.driverCard {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.driverAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.driverName { font-size: 13px; font-weight: 600; }
+.driverSub  { font-size: 11px; color: var(--ink-muted); }
+
+.callBtn {
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--teal-light);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+}

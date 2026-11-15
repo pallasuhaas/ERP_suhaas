@@ -1,0 +1,196 @@
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+}
+
+/* Hide sidebar on mobile */
+@media (max-width: 767px) {
+  .sidebar { display: none; }
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.logoMark {
+  width: 40px; height: 40px;
+  background: var(--accent);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
+
+.logoName {
+  font-family: 'Fraunces', serif;
+  font-size: 16px; font-weight: 700;
+  color: white;
+}
+
+.logoSub {
+  font-size: 10px; color: rgba(255,255,255,0.35);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* Nav items */
+.nav {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  background: none; border: none;
+  font-size: 14px; font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background var(--transition), color var(--transition);
+}
+
+.navItem:hover {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.85);
+}
+
+.navItem.active {
+  background: rgba(232,82,26,0.18);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.navIcon { font-size: 18px; flex-shrink: 0; }
+.navLabel { font-size: 14px; }
+
+/* Bottom */
+.bottom {
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.settingsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: none; border: none;
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background var(--transition), color var(--transition);
+}
+
+.settingsRow:hover {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.8);
+}
+
+.settingsIcon { font-size: 16px; }
+.settingsLabel { font-size: 13px; }
+
+.childPill {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 10px;
+}
+
+.pillLabel { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+.pillName  { font-size: 13px; font-weight: 700; color: white; }
+.pillMeta  { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+
+/* Child switcher — shown when parent has multiple children */
+.switcherList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.switcherBtn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.switcherBtn:hover {
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.18);
+}
+
+.switcherActive {
+  background: rgba(232,82,26,0.15) !important;
+  border-color: rgba(232,82,26,0.4) !important;
+}
+
+.switcherAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.switcherActive .switcherAvatar {
+  background: rgba(232,82,26,0.35);
+  color: #fff;
+}
+
+.switcherName {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.65);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.switcherActive .switcherName {
+  color: #fff;
+}
+
+.switcherCheck {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
