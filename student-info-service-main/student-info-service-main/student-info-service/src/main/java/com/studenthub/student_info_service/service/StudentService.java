@@ -2,9 +2,14 @@ package com.studenthub.student_info_service.service;
 
 import com.studenthub.student_info_service.data.model.Student;
 import com.studenthub.student_info_service.data.repository.StudentRepository;
+import com.studenthub.student_info_service.dto.BulkUploadResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class StudentService {
@@ -26,6 +31,30 @@ public class StudentService {
 
     public Student createStudent(Student student) {
         return repository.save(student);
+    }
+
+    // Saves each student independently; rows whose admissionNumber already exists
+    // (in the DB or earlier in the same upload) or that fail to persist are skipped.
+    public BulkUploadResponse bulkCreate(List<Student> students) {
+        List<Student> saved = new ArrayList<>();
+        List<String> skipped = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+
+        for (Student student : students) {
+            String admissionNumber = student.getAdmissionNumber();
+            if (admissionNumber == null || admissionNumber.isBlank()
+                    || !seen.add(admissionNumber)
+                    || repository.findByAdmissionNumber(admissionNumber).isPresent()) {
+                skipped.add(admissionNumber);
+                continue;
+            }
+            try {
+                saved.add(repository.save(student));
+            } catch (DataIntegrityViolationException e) {
+                skipped.add(admissionNumber);
+            }
+        }
+        return new BulkUploadResponse(saved.size(), skipped.size(), saved, skipped);
     }
 
     public Student updateStudent(Long id, Student updated) {

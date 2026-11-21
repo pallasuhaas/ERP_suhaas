@@ -1,6 +1,7 @@
 package com.studenthub.student_info_service.controllers;
 
 import com.studenthub.student_info_service.data.model.Student;
+import com.studenthub.student_info_service.dto.BulkUploadResponse;
 import com.studenthub.student_info_service.service.StudentService;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,11 @@ public class StudentController {
     @PostMapping
     public Student createStudent(@RequestBody Student student) {
         return service.createStudent(student);
+    }
+
+    @PostMapping("/bulk")
+    public BulkUploadResponse bulkCreateStudents(@RequestBody List<Student> students) {
+        return service.bulkCreate(students);
     }
 
     @PutMapping("/{id}")

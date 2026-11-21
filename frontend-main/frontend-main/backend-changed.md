@@ -124,6 +124,24 @@
 
 ---
 
+## 2026-11-15 — Transport vehicle 500 fix + student bulk-upload endpoint
+
+**Approved by:** developer (requested during end-to-end testing)
+
+### transport-service
+**Files:** `data/model/Driver.java`, `TransportRoute.java`, `Vehicle.java`, `TripSession.java`
+**Change:** added `@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})` (same fix previously applied in payment-service).
+**Reason:** `POST/GET /api/vehicles` returned HTTP 500. The vehicle was saved, but Jackson failed serialising the lazy `Vehicle.driver` Hibernate proxy (`No serializer found for class ...ByteBuddyInterceptor`). The same latent bug affected every entity returning these as lazy references.
+
+### student-info-service
+**Files:** new `dto/BulkUploadResponse.java`; `service/StudentService.java` (`bulkCreate()`); `controllers/StudentController.java` (`POST /api/students/bulk`).
+**Reason:** Admin > Students > Bulk Upload > "Enroll N Students" returned 405 because the endpoint did not exist in the running service.
+**Behaviour:** body = JSON array of students; each row saved independently; rows with an existing or repeated `admissionNumber` are skipped. Response: `{saved, skipped, students[], skippedAdmissionNumbers[]}`.
+
+**Action needed:** restart transport-service and student-info-service to pick up the changes.
+
+---
+
 ## Future Change Requests
 
 All future changes to any backend repo must be logged here with:
