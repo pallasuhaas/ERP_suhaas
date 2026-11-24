@@ -381,13 +381,13 @@ export default function Finance() {
   useEffect(() => {
     if (tab !== 'years') return
     setYearsLoading(true)
-    getAcademicYears().then(setYears).catch(() => {}).finally(() => setYearsLoading(false))
+    getAcademicYears().then(d => setYears(Array.isArray(d) ? d : [])).catch(() => {}).finally(() => setYearsLoading(false))
   }, [tab])
 
   // Load terms when a year is expanded
   useEffect(() => {
     if (!expandedYear) { setTerms([]); return }
-    getFeeTerms(expandedYear).then(setTerms).catch(() => setTerms([]))
+    getFeeTerms(expandedYear).then(d => setTerms(Array.isArray(d) ? d : [])).catch(() => setTerms([]))
   }, [expandedYear])
 
   async function handleCreateYear() {
@@ -398,7 +398,7 @@ export default function Finance() {
       setAddYearOpen(false); setAddYearLabel(''); setAddYearStart(''); setAddYearEnd(''); setAddYearCurrent(false)
       setYearsLoading(true)
       const fresh = await getAcademicYears()
-      setYears(fresh)
+      setYears(Array.isArray(fresh) ? fresh : [])
     } catch (e) { setAddYearErr(e.message) }
     finally { setAddYearSaving(false); setYearsLoading(false) }
   }
@@ -420,7 +420,7 @@ export default function Finance() {
         termName: addTermName, startDate: addTermStart, endDate: addTermEnd,
         feePercentage: addTermPct ? Number(addTermPct) : null,
       })
-      setTerms(ts => [...ts, t])
+      if (t) setTerms(ts => [...ts, t])
       setAddTermOpen(false); setAddTermName(''); setAddTermStart(''); setAddTermEnd(''); setAddTermPct('')
     } catch (e) { setAddTermErr(e.message) }
     finally { setAddTermSaving(false) }
