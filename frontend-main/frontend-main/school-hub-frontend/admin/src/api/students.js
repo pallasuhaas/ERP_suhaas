@@ -1,3 +1,6 @@
+import { splitCSVLine } from './csv'
+import { friendlyError, safeFetch } from './errors'
+
 const BASE = '/api/students'
 
 export async function getStudents() {
@@ -69,11 +72,10 @@ export function parseCSV(text) {
   const lines = text.trim().split(/\r?\n/)
   if (lines.length < 2) return []
 
-  const rawHeaders = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\s+/g, '_'))
+  const rawHeaders = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'))
 
   return lines.slice(1).filter(l => l.trim()).map((line, idx) => {
-    // Handle quoted fields
-    const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''))
+    const values = splitCSVLine(line)
     const raw = {}
     rawHeaders.forEach((h, i) => { raw[h] = values[i] ?? '' })
 
@@ -112,13 +114,13 @@ export function parseCSV(text) {
 
 // ─── req helper (mirrors transport.js pattern) ────────────────────────────────
 async function req(url, opts = {}) {
-  const res = await fetch(url, {
+  const res = await safeFetch(url, {
     headers: { 'Content-Type': 'application/json', ...opts.headers },
     ...opts,
   })
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText)
-    throw new Error(text || res.statusText)
+    throw new Error(friendlyError(res.status, text))
   }
   const ct = res.headers.get('content-type') || ''
   return ct.includes('application/json') ? res.json() : null

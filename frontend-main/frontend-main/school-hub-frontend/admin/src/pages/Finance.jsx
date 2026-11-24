@@ -392,6 +392,7 @@ export default function Finance() {
 
   async function handleCreateYear() {
     if (!addYearLabel || !addYearStart || !addYearEnd) return setAddYearErr('Year label, start date and end date are required.')
+    if (addYearEnd <= addYearStart) return setAddYearErr('End date must be after the start date.')
     setAddYearErr(null); setAddYearSaving(true)
     try {
       await createAcademicYear({ yearLabel: addYearLabel, startDate: addYearStart, endDate: addYearEnd, isCurrent: addYearCurrent })

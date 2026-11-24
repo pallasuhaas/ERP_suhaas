@@ -95,6 +95,8 @@ export default function Students() {
   const [bulkGrade,      setBulkGrade]      = useState('')
   const [bulkRouteId,    setBulkRouteId]    = useState('')
   const [bulkVehicleId,  setBulkVehicleId]  = useState('')
+  const [bulkPickup,     setBulkPickup]     = useState('')
+  const [bulkDrop,       setBulkDrop]       = useState('')
   const [bulkNewGrade,   setBulkNewGrade]   = useState('')
   const [bulkNewSection, setBulkNewSection] = useState('')
   const [bulkSaving,     setBulkSaving]     = useState(false)
@@ -271,14 +273,20 @@ export default function Students() {
 
   async function handleBulkAssignRoute() {
     if (!bulkRouteId || !bulkVehicleId) return setBulkErr('Select both a route and vehicle.')
+    const route = routes.find(r => String(r.routeId) === String(bulkRouteId))
+    const pickupPoint = bulkPickup.trim() || route?.startPoint || ''
+    const dropPoint   = bulkDrop.trim()   || route?.endPoint   || ''
+    if (!pickupPoint || !dropPoint) return setBulkErr('Enter pickup and drop points (this route has no start/end point to use).')
     setBulkErr(null); setBulkSaving(true)
     try {
       await Promise.all(selected.map(sid => createAssignment(sid, bulkRouteId, bulkVehicleId, {
+        pickupPoint,
+        dropPoint,
         effectiveFrom: new Date().toISOString().slice(0, 10),
         effectiveTo: null,
       })))
       setBulkMsg(`Transport assigned to ${selected.length} students.`)
-      setBulkRouteId(''); setBulkVehicleId(''); setSelected([])
+      setBulkRouteId(''); setBulkVehicleId(''); setBulkPickup(''); setBulkDrop(''); setSelected([])
       setTimeout(() => setBulkMsg(null), 3000)
     } catch (e) { setBulkErr(e.message) }
     finally { setBulkSaving(false) }
@@ -309,6 +317,24 @@ export default function Students() {
   async function handleSaveStudent() {
     if (!formData.firstName || !formData.lastName || !formData.admissionNumber) {
       setFormError('First name, last name and admission number are required.')
+      return
+    }
+    const localToday = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD in local time
+    const grade = String(formData.gradeLevel ?? '').trim()
+    if (!/^\d+$/.test(grade)) {
+      setFormError('Grade must be a number (e.g. 8).')
+      return
+    }
+    if (!formData.dateOfBirth || formData.dateOfBirth >= localToday) {
+      setFormError('Date of birth must be in the past.')
+      return
+    }
+    if (formData.admissionDate && formData.admissionDate > localToday) {
+      setFormError('Admission date cannot be in the future.')
+      return
+    }
+    if (addParentPhone.trim() && !/^\d{10}$/.test(addParentPhone.replace(/[\s-]/g, ''))) {
+      setFormError('Parent phone must be 10 digits.')
       return
     }
     setSaving(true)
@@ -849,6 +875,10 @@ export default function Students() {
                     <option value="">— Vehicle —</option>
                     {vehicles.map(v => <option key={v.vehicleId} value={v.vehicleId}>{v.registrationNumber}</option>)}
                   </select>
+                  <input className="filter-select" placeholder="Pickup (default: route start)" value={bulkPickup}
+                    onChange={e => setBulkPickup(e.target.value)} style={{ width: 190 }} />
+                  <input className="filter-select" placeholder="Drop (default: route end)" value={bulkDrop}
+                    onChange={e => setBulkDrop(e.target.value)} style={{ width: 180 }} />
                   <button className="btn-primary" onClick={handleBulkAssignRoute} disabled={bulkSaving || !bulkRouteId || !bulkVehicleId}>
                     {bulkSaving ? '…' : 'Assign'}
                   </button>

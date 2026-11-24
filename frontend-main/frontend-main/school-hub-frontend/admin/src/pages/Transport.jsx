@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import styles from './Transport.module.css'
 import { getStudents } from '../api/students'
+import { splitCSVLine } from '../api/csv'
 import {
   getVehicles, createVehicle, deleteVehicle, updateVehicle,
   getDrivers, createDriver, deleteDriver, updateDriver,
@@ -128,10 +129,12 @@ function FleetTab({ vehicles, drivers, driverMap, loading, onReload }) {
   async function handleAddVehicle(e) {
     e.preventDefault()
     setVErr(null)
+    if (!vForm.registrationNumber.trim()) return setVErr('Registration number is required.')
+    if (!(Number(vForm.capacity) >= 1)) return setVErr('Capacity must be at least 1.')
     setVSaving(true)
     try {
       await createVehicle(vForm.driverId || null, {
-        registrationNumber: vForm.registrationNumber,
+        registrationNumber: vForm.registrationNumber.trim(),
         vehicleType: vForm.vehicleType,
         capacity: Number(vForm.capacity),
         status: vForm.status,
@@ -1208,9 +1211,9 @@ function TransportCSVUpload({ students, routes, vehicles, onDone }) {
     reader.onload = e => {
       const lines = e.target.result.trim().split(/\r?\n/)
       if (lines.length < 2) return alert('No data rows found.')
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\s+/g, '_'))
+      const headers = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'))
       const parsed = lines.slice(1).filter(l => l.trim()).map((line, idx) => {
-        const vals = line.split(',').map(v => v.trim())
+        const vals = splitCSVLine(line)
         const raw = {}
         headers.forEach((h, i) => { raw[h] = vals[i] || '' })
         const admKey  = (raw['admission_number'] || '').toLowerCase()

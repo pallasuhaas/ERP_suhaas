@@ -6,6 +6,7 @@ import com.studenthub.payment_service.data.model.*;
 import com.studenthub.payment_service.data.repository.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -56,6 +57,20 @@ public class FeeInvoiceService {
             discount = discountPolicyRepository.findById(discountId)
                     .orElseThrow(() -> new RuntimeException("DiscountPolicy not found with id: " + discountId));
         }
+
+        // totalAmount = net payable, discountApplied = rupees taken off, gross = feeStructure.amount
+        if (invoice.getInvoiceDate() == null) {
+            invoice.setInvoiceDate(LocalDate.now());
+        }
+        double gross = feeStructure.getAmount();
+        double off = 0.0;
+        if (discount != null
+                && !invoice.getInvoiceDate().isBefore(discount.getValidFrom())
+                && !invoice.getInvoiceDate().isAfter(discount.getValidTo())) {
+            off = Math.round(gross * discount.getDiscountPercentage()) / 100.0;
+        }
+        invoice.setDiscountApplied(off);
+        invoice.setTotalAmount(gross - off);
 
         // We only store the studentId, not the full Student entity
         invoice.setStudentId(student.getStudentId());

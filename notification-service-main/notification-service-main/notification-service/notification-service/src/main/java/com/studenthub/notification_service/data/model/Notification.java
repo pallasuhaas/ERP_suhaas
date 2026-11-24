@@ -24,6 +24,9 @@ public class Notification {
     @Column(name = "user_id")
     private Long userId; // referenced via REST call, not JPA relation
 
+    @Column(name = "title", length = 200)
+    private String title;
+
     @Column(name = "message", nullable = false, length = 500)
     private String message;
 
