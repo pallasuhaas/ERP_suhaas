@@ -33,4 +33,8 @@ public class TransportRoute {
 
     @Column(name = "estimated_time_minutes")
     private Integer estimatedTimeMinutes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehicle_id")
+    private Vehicle vehicle;
 }

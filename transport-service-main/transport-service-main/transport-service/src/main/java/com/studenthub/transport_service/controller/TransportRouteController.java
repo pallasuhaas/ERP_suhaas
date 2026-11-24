@@ -27,14 +27,16 @@ public class TransportRouteController {
     }
 
     @PostMapping
-    public TransportRoute createRoute(@RequestBody TransportRoute route) {
-        return service.createRoute(route);
+    public TransportRoute createRoute(@RequestBody TransportRoute route,
+                                      @RequestParam(required = false) Long vehicleId) {
+        return service.createRoute(route, vehicleId);
     }
 
     @PutMapping("/{id}")
     public TransportRoute updateRoute(@PathVariable Long id,
-                                      @RequestBody TransportRoute route) {
-        return service.updateRoute(id, route);
+                                      @RequestBody TransportRoute route,
+                                      @RequestParam(required = false) Long vehicleId) {
+        return service.updateRoute(id, route, vehicleId);
     }
 
     @DeleteMapping("/{id}")

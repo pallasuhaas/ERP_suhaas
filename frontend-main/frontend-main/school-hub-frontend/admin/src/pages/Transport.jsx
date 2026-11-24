@@ -1177,13 +1177,13 @@ function EnrollTab({ assignments, students, vehicles, routes, studentMap, vehicl
 }
 
 // ── Transport CSV Upload sub-component ───────────────────────────────────────
-const TRANSPORT_CSV_HEADERS = ['admission_number', 'route_name', 'pickup_point', 'drop_point', 'effective_from', 'transport_fee']
+const TRANSPORT_CSV_HEADERS = ['admission_number', 'route_name', 'vehicle_registration', 'pickup_point', 'drop_point', 'effective_from', 'transport_fee']
 
 function downloadTransportTemplate() {
   const rows = [
     TRANSPORT_CSV_HEADERS.join(','),
-    'DPS2024001,Route 1,Koramangala Bus Stop,School Main Gate,2024-06-01,1200',
-    'DPS2024002,Route 2,Indiranagar 100ft Road,School Side Gate,2024-06-01,1400',
+    'DPS2024001,Route 1,KA01AB1234,Koramangala Bus Stop,School Main Gate,2024-06-01,1200',
+    'DPS2024002,Route 2,KA01AB5678,Indiranagar 100ft Road,School Side Gate,2024-06-01,1400',
   ]
   const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
@@ -1191,7 +1191,7 @@ function downloadTransportTemplate() {
   URL.revokeObjectURL(url)
 }
 
-function TransportCSVUpload({ students, routes, onDone }) {
+function TransportCSVUpload({ students, routes, vehicles, onDone }) {
   const [rows,      setRows]      = useState([])
   const [step,      setStep]      = useState('upload') // upload | preview | done
   const [uploading, setUploading] = useState(false)
@@ -1200,6 +1200,7 @@ function TransportCSVUpload({ students, routes, onDone }) {
 
   const studentByAdm = Object.fromEntries(students.map(s => [(s.admissionNumber || '').toLowerCase(), s]))
   const routeByName  = Object.fromEntries(routes.map(r => [(r.routeName || '').toLowerCase(), r]))
+  const vehicleByReg = Object.fromEntries(vehicles.map(v => [(v.registrationNumber || '').toLowerCase(), v]))
 
   function parseFile(file) {
     if (!file) return
@@ -1216,11 +1217,16 @@ function TransportCSVUpload({ students, routes, onDone }) {
         const rteKey  = (raw['route_name'] || '').toLowerCase()
         const student = studentByAdm[admKey]
         const route   = routeByName[rteKey]
+        const vehReg  = raw['vehicle_registration'] || ''
+        const vehicle = vehicleByReg[vehReg.toLowerCase()]
+        const vehicleId = vehicle?.vehicleId ?? route?.vehicle?.vehicleId
         const errors  = []
         if (!raw['admission_number']) errors.push('admission_number required')
         else if (!student)            errors.push(`Student "${raw['admission_number']}" not found`)
         if (!raw['route_name'])       errors.push('route_name required')
         else if (!route)              errors.push(`Route "${raw['route_name']}" not found`)
+        if (vehReg && !vehicle)       errors.push(`Vehicle "${vehReg}" not found`)
+        else if (route && !vehicleId) errors.push('vehicle_registration required (route has no vehicle)')
         return {
           _row: idx + 2, _errors: errors, _valid: errors.length === 0,
           admissionNumber: raw['admission_number'],
@@ -1231,6 +1237,7 @@ function TransportCSVUpload({ students, routes, onDone }) {
           transportFee: parseFloat(raw['transport_fee']) || 0,
           studentId: student?.studentId,
           routeId:   route?.routeId,
+          vehicleId,
         }
       })
       setRows(parsed); setStep('preview')
@@ -1245,9 +1252,7 @@ function TransportCSVUpload({ students, routes, onDone }) {
     const saved = [], failed = []
     for (const r of valid) {
       try {
-        const route = routeByName[(r.routeName || '').toLowerCase()]
-        const vehicleId = route?.vehicle?.vehicleId || null
-        await createAssignment(r.studentId, r.routeId, vehicleId, {
+        await createAssignment(r.studentId, r.routeId, r.vehicleId, {
           pickupPoint: r.pickupPoint,
           dropPoint: r.dropPoint,
           effectiveFrom: r.effectiveFrom,
@@ -1303,7 +1308,7 @@ function TransportCSVUpload({ students, routes, onDone }) {
           <div className="upload-zone" onClick={() => fileRef.current?.click()} style={{ cursor: 'pointer' }}>
             <div className="upload-icon">🚌</div>
             <div className="upload-title">Drop CSV or click to browse</div>
-            <div className="upload-sub">Columns: admission_number, route_name, pickup_point, drop_point, effective_from, transport_fee</div>
+            <div className="upload-sub">Columns: admission_number, route_name, vehicle_registration, pickup_point, drop_point, effective_from, transport_fee</div>
             <input ref={fileRef} type="file" accept=".csv,.txt" style={{ display: 'none' }} onChange={e => parseFile(e.target.files[0])} />
           </div>
           <div className={styles.templateRowSmall}>
