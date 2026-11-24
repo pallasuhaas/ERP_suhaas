@@ -1,6 +1,7 @@
 package com.studenthub.student_info_service.service;
 
 import com.studenthub.student_info_service.data.model.Student;
+import com.studenthub.student_info_service.data.model.StudentStatus;
 import com.studenthub.student_info_service.data.repository.StudentRepository;
 import com.studenthub.student_info_service.dto.BulkUploadResponse;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -71,6 +72,16 @@ public class StudentService {
         existing.setStatus(updated.getStatus());
 
         return repository.save(existing);
+    }
+
+    public Student updateStatus(Long id, StudentStatus status) {
+        Student s = getStudentById(id);
+        s.setStatus(status);
+        return repository.save(s);
+    }
+
+    public List<Student> getArchivedStudents() {
+        return repository.findByStatus(StudentStatus.ARCHIVED);
     }
 
     public void deleteStudent(Long id) {
