@@ -27,5 +27,6 @@ export async function getStudentTransport(studentId) {
 
 /** Get route stops for a routeId, ordered by sequenceOrder. */
 export async function getRouteStops(routeId) {
-  return req(`${BASE}/route-stops?routeId=${routeId}`)
+  // BUG-015: the backend only serves /api/route-stops/route/{routeId}
+  return req(`${BASE}/route-stops/route/${routeId}`)
 }
