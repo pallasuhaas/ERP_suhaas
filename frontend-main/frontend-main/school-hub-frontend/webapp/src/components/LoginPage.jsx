@@ -40,8 +40,11 @@ export default function LoginPage({ onLogin }) {
       setStep('otp')
       startResendTimer()
       setTimeout(() => otpRefs.current[0]?.focus(), 100)
-    } catch {
-      setPhoneError('Unable to reach server. Check your connection and try again.')
+    } catch (err) {
+      // BUG-017: an HTTP error (incl. the Vite proxy's 5xx when a backend is down) vs. no network at all
+      setPhoneError(err.status
+        ? 'Something went wrong on our side. Please try again later.'
+        : 'Unable to reach server. Check your connection and try again.')
     } finally {
       setLoading(false)
     }

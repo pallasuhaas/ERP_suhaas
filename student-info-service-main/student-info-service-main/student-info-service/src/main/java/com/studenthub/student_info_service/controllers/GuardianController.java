@@ -22,6 +22,12 @@ public class GuardianController {
         return guardianService.getGuardiansByStudent(studentId);
     }
 
+    // BUG-017: parent portal login looks up the children linked to a phone number
+    @GetMapping("/phone/{phone}")
+    public List<Guardian> getGuardiansByPhone(@PathVariable String phone) {
+        return guardianService.getGuardiansByPhone(phone);
+    }
+
     @GetMapping("/{id}")
     public Guardian getGuardianById(@PathVariable Long id) {
         return guardianService.getGuardianById(id);

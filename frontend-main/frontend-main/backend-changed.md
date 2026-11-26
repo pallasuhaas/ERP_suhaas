@@ -218,6 +218,37 @@
 
 ---
 
+## 2026-11-26 — Parent-role bugs (BUGS-BY-ROLE.md, section 2): 017, 015, 018d
+
+**Approved by:** developer (pallasuhaas) — requested explicitly ("do these bug fixes and test it end to end")
+**Branch:** `bug6-parent`
+
+### student-info-service — BUG-017 (parent login by phone)
+| File | Change |
+|------|--------|
+| `data/repository/GuardianRepository.java` | Added `List<Guardian> findByPhone(String phone)`. |
+| `service/GuardianService.java` | Added `getGuardiansByPhone(phone)`. The input is normalised the same way phones are stored (digits only, a leading `91` dropped from 12-digit input), so "98450 01122", "98450-01122" and "+91 9845001122" all match. Empty or non-numeric input → `[]`. |
+| `controllers/GuardianController.java` | Added `GET /api/guardians/phone/{phone}` → list of guardians, each with the nested `student`. Empty list = no account. |
+| `data/model/Guardian.java` | `student` changed from `FetchType.LAZY` to `EAGER` so the child's details are always serialised. |
+
+Note: guardian phones saved **before** BUG-008b with spaces or `+91` won't match until they are re-saved (saving now stores plain digits).
+
+### notification-service — BUG-018d (read flag)
+| File | Change |
+|------|--------|
+| `data/model/Notification.java` | Added `Boolean isRead` (column `is_read`, `@Builder.Default false`). Kept as `Boolean` so the JSON field is `isRead`. Existing rows are NULL, which the parent UI treats as unread. |
+| `service/NotificationService.java` | `create()` sets `isRead=false`; added `markRead(id)` and `markAllRead(studentId)`. |
+| `controller/NotificationController.java` | Added `PATCH /api/notifications/{id}/read` (404 for unknown id) and `PATCH /api/notifications/student/{studentId}/read-all`. |
+
+### Frontend (parent portal)
+* BUG-017: `api/parent.js` keeps the HTTP status on errors. `LoginPage.jsx` now shows "Something went wrong on our side…" for a server error and "Unable to reach server…" only when there's no connection.
+* BUG-015: `getRouteStops` uses `/api/route-stops/route/{routeId}`.
+
+**Database:** `notification.is_read` (bit, nullable) is added by `ddl-auto=update` on restart.
+**Action needed:** restart student-info-service and notification-service.
+
+---
+
 ## Future Change Requests
 
 All future changes to any backend repo must be logged here with:

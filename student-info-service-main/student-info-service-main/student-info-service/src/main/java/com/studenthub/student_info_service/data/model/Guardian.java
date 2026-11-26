@@ -38,7 +38,8 @@ public class Guardian {
     @Size(max = 150)
     private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // BUG-017: EAGER so the child's details are always in the response (parent login reads guardian.student)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "student_id", nullable = false)
     private Student student;
 }
