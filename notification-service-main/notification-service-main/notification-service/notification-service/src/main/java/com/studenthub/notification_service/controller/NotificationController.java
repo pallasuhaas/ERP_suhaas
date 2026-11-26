@@ -54,6 +54,17 @@ public class NotificationController {
         return service.update(id, notification);
     }
 
+    // BUG-018d
+    @PatchMapping("/{id}/read")
+    public Notification markRead(@PathVariable Long id) {
+        return service.markRead(id);
+    }
+
+    @PatchMapping("/student/{studentId}/read-all")
+    public void markAllRead(@PathVariable Long studentId) {
+        service.markAllRead(studentId);
+    }
+
     @PutMapping("/{id}/sent")
     public Notification markAsSent(@PathVariable Long id) {
         return service.markAsSent(id);

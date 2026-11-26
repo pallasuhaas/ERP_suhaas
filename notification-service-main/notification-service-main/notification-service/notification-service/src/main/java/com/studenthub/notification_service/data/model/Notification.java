@@ -53,4 +53,10 @@ public class Notification {
 
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
+
+    // BUG-018d: Boolean (not boolean) so Jackson names the field "isRead", which the parent portal reads.
+    // Rows created before this column existed are NULL, which the UI treats as unread.
+    @Builder.Default
+    @Column(name = "is_read")
+    private Boolean isRead = false;
 }

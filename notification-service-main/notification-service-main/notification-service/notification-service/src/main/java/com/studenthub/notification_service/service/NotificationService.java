@@ -40,6 +40,7 @@ public class NotificationService {
 
     public Notification create(Notification notification) {
         notification.setStatus(NotificationStatus.PENDING);
+        notification.setIsRead(false);
         return repository.save(notification);
     }
 
@@ -71,6 +72,20 @@ public class NotificationService {
                         .build())
                 .toList();
         return repository.saveAll(batch);
+    }
+
+    // BUG-018d: parent portal "tap to read" and "Mark all read"
+    public Notification markRead(Long id) {
+        Notification n = getById(id);
+        n.setIsRead(true);
+        return repository.save(n);
+    }
+
+    @Transactional
+    public void markAllRead(Long studentId) {
+        List<Notification> list = repository.findByStudentId(studentId);
+        list.forEach(n -> n.setIsRead(true));
+        repository.saveAll(list);
     }
 
     public Notification markAsSent(Long id) {
