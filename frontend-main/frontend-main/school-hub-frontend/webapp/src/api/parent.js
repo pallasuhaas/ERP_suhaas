@@ -2,7 +2,8 @@ const BASE = '/api'
 
 async function req(url) {
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  // BUG-017: keep the status so callers can tell "server answered with an error" from "server unreachable"
+  if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status}`), { status: res.status })
   return res.json()
 }
 

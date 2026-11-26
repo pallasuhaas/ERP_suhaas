@@ -27,6 +27,15 @@ public class GuardianService {
         return guardianRepository.findByStudentStudentId(studentId);
     }
 
+    // BUG-017: parent-portal login. Phones are stored as 10 plain digits (see validate()), so the input is
+    // normalised the same way: "98450 01122", "98450-01122" and "+91 9845001122" all match 9845001122.
+    public List<Guardian> getGuardiansByPhone(String phone) {
+        String digits = phone == null ? "" : phone.replaceAll("\\D", "");
+        if (digits.length() == 12 && digits.startsWith("91")) digits = digits.substring(2);
+        if (digits.isEmpty()) return List.of();
+        return guardianRepository.findByPhone(digits);
+    }
+
     public Guardian getGuardianById(Long id) {
         return guardianRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Guardian not found with id: " + id));

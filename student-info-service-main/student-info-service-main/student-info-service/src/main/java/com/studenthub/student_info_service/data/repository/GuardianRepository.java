@@ -8,5 +8,6 @@ import java.util.List;
 public interface GuardianRepository extends JpaRepository<Guardian, Long> {
 
     List<Guardian> findByStudentStudentId(Long studentId);
+    List<Guardian> findByPhone(String phone);
     void deleteByStudentStudentId(Long studentId);
 }
