@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.controllers;
 
+import jakarta.validation.Valid;
 import com.studenthub.student_info_service.data.model.ContactInfo;
 import com.studenthub.student_info_service.service.ContactInfoService;
 import org.springframework.web.bind.annotation.*;
@@ -27,12 +28,12 @@ public class ContactInfoController {
     }
 
     @PostMapping("/student/{studentId}")
-    public ContactInfo create(@PathVariable Long studentId, @RequestBody ContactInfo info) {
+    public ContactInfo create(@PathVariable Long studentId, @Valid @RequestBody ContactInfo info) {
         return service.createContactInfo(studentId, info);
     }
 
     @PutMapping("/{id}")
-    public ContactInfo update(@PathVariable Long id, @RequestBody ContactInfo info) {
+    public ContactInfo update(@PathVariable Long id, @Valid @RequestBody ContactInfo info) {
         return service.updateContactInfo(id, info);
     }
 

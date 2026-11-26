@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.service;
 
+import com.studenthub.transport_service.exception.ResourceNotFoundException;
 import com.studenthub.transport_service.data.model.*;
 import com.studenthub.transport_service.data.repository.VehicleRepository;
 import com.studenthub.transport_service.data.repository.VehicleTrackingRepository;
@@ -26,13 +27,13 @@ public class VehicleTrackingService {
 
     public VehicleTracking getTrackingById(Long id) {
         return trackingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tracking record not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Tracking record not found with id: " + id));
     }
 
     public VehicleTracking createTracking(Long vehicleId, VehicleTracking tracking) {
 
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + vehicleId));
 
         tracking.setVehicle(vehicle);
         return trackingRepository.save(tracking);

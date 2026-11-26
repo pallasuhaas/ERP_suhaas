@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.controllers;
 
+import jakarta.validation.Valid;
 import com.studenthub.student_info_service.data.model.Guardian;
 import com.studenthub.student_info_service.service.GuardianService;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class GuardianController {
 
     @PostMapping("/student/{studentId}")
     public Guardian createGuardian(@PathVariable Long studentId,
-                                   @RequestBody Guardian guardian) {
+                                   @Valid @RequestBody Guardian guardian) {
         return guardianService.createGuardian(studentId, guardian);
     }
 
     @PutMapping("/{id}")
     public Guardian updateGuardian(@PathVariable Long id,
-                                   @RequestBody Guardian guardian) {
+                                   @Valid @RequestBody Guardian guardian) {
         return guardianService.updateGuardian(id, guardian);
     }
 

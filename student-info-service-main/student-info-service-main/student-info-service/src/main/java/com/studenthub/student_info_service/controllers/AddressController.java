@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.controllers;
 
+import jakarta.validation.Valid;
 import com.studenthub.student_info_service.data.model.Address;
 import com.studenthub.student_info_service.service.AddressService;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class AddressController {
 
     @PostMapping("/student/{studentId}")
     public Address createAddress(@PathVariable Long studentId,
-                                 @RequestBody Address address) {
+                                 @Valid @RequestBody Address address) {
         return service.createAddress(studentId, address);
     }
 
     @PutMapping("/{id}")
     public Address updateAddress(@PathVariable Long id,
-                                 @RequestBody Address address) {
+                                 @Valid @RequestBody Address address) {
         return service.updateAddress(id, address);
     }
 

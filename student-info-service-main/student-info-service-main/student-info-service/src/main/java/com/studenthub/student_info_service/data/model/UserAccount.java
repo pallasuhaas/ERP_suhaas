@@ -1,6 +1,7 @@
 package com.studenthub.student_info_service.data.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
@@ -18,13 +19,18 @@ public class UserAccount {
     private Long userId;
 
     @Column(name = "username", nullable = false, unique = true, length = 100)
+    @NotBlank
+    @Size(max = 100)
     private String username;
 
     @Column(name = "password_hash", nullable = false, length = 255)
+    @NotBlank
+    @Size(max = 255)
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
+    @NotNull
     private UserRole role;
 
     @Column(name = "enabled", nullable = false)

@@ -13,4 +13,6 @@ public interface TripSessionRepository extends JpaRepository<TripSession, Long> 
     List<TripSession> findByRouteRouteId(Long routeId);
 
     List<TripSession> findByTripDate(LocalDate tripDate);
+    long countByVehicleVehicleId(Long vehicleId);
+    long countByRouteRouteId(Long routeId);
 }

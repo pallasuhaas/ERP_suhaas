@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.service;
 
+import com.studenthub.student_info_service.exception.ResourceNotFoundException;
 import com.studenthub.student_info_service.data.model.Student;
 import com.studenthub.student_info_service.data.model.StudentProfileSnapshot;
 import com.studenthub.student_info_service.data.repository.StudentProfileSnapshotRepository;
@@ -26,12 +27,12 @@ public class StudentProfileSnapshotService {
 
     public StudentProfileSnapshot getSnapshotById(Long id) {
         return snapshotRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Snapshot not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Snapshot not found with id: " + id));
     }
 
     public StudentProfileSnapshot createSnapshot(Long studentId, StudentProfileSnapshot snapshot) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
 
         snapshot.setStudent(student);
         return snapshotRepository.save(snapshot);

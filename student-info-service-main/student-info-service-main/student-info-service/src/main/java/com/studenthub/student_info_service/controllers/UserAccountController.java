@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.controllers;
 
+import jakarta.validation.Valid;
 import com.studenthub.student_info_service.data.model.UserAccount;
 import com.studenthub.student_info_service.service.UserAccountService;
 import org.springframework.web.bind.annotation.*;
@@ -33,13 +34,13 @@ public class UserAccountController {
 
     @PostMapping
     public UserAccount createUser(@RequestParam(required = false) Long studentId,
-                                  @RequestBody UserAccount userAccount) {
+                                  @Valid @RequestBody UserAccount userAccount) {
         return service.createUser(studentId, userAccount);
     }
 
     @PutMapping("/{id}")
     public UserAccount updateUser(@PathVariable Long id,
-                                  @RequestBody UserAccount userAccount) {
+                                  @Valid @RequestBody UserAccount userAccount) {
         return service.updateUser(id, userAccount);
     }
 

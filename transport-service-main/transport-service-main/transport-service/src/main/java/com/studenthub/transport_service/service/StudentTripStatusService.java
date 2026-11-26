@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.service;
 
+import com.studenthub.transport_service.exception.ResourceNotFoundException;
 import com.studenthub.transport_service.data.model.*;
 import com.studenthub.transport_service.data.repository.StudentTripStatusRepository;
 import com.studenthub.transport_service.data.repository.TripSessionRepository;
@@ -25,7 +26,7 @@ public class StudentTripStatusService {
 
     public StudentTripStatus getStatusById(Long id) {
         return statusRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("StudentTripStatus not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("StudentTripStatus not found with id: " + id));
     }
 
     public List<StudentTripStatus> getStatusesByStudent(Long studentId) {
@@ -41,7 +42,7 @@ public class StudentTripStatusService {
                                           StudentTripStatus status) {
 
         TripSession trip = tripRepository.findById(tripId)
-                .orElseThrow(() -> new RuntimeException("TripSession not found with id: " + tripId));
+                .orElseThrow(() -> new ResourceNotFoundException("TripSession not found with id: " + tripId));
 
         status.setStudentId(studentId);
         status.setTrip(trip);

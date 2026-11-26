@@ -12,4 +12,6 @@ public interface StudentTransportAssignmentRepository extends JpaRepository<Stud
     List<StudentTransportAssignment> findByRouteRouteId(Long routeId);
 
     List<StudentTransportAssignment> findByVehicleVehicleId(Long vehicleId);
+    long countByVehicleVehicleId(Long vehicleId);
+    long countByRouteRouteId(Long routeId);
 }

@@ -381,24 +381,25 @@ export default function Finance() {
   useEffect(() => {
     if (tab !== 'years') return
     setYearsLoading(true)
-    getAcademicYears().then(setYears).catch(() => {}).finally(() => setYearsLoading(false))
+    getAcademicYears().then(d => setYears(Array.isArray(d) ? d : [])).catch(() => {}).finally(() => setYearsLoading(false))
   }, [tab])
 
   // Load terms when a year is expanded
   useEffect(() => {
     if (!expandedYear) { setTerms([]); return }
-    getFeeTerms(expandedYear).then(setTerms).catch(() => setTerms([]))
+    getFeeTerms(expandedYear).then(d => setTerms(Array.isArray(d) ? d : [])).catch(() => setTerms([]))
   }, [expandedYear])
 
   async function handleCreateYear() {
     if (!addYearLabel || !addYearStart || !addYearEnd) return setAddYearErr('Year label, start date and end date are required.')
+    if (addYearEnd <= addYearStart) return setAddYearErr('End date must be after the start date.')
     setAddYearErr(null); setAddYearSaving(true)
     try {
       await createAcademicYear({ yearLabel: addYearLabel, startDate: addYearStart, endDate: addYearEnd, isCurrent: addYearCurrent })
       setAddYearOpen(false); setAddYearLabel(''); setAddYearStart(''); setAddYearEnd(''); setAddYearCurrent(false)
       setYearsLoading(true)
       const fresh = await getAcademicYears()
-      setYears(fresh)
+      setYears(Array.isArray(fresh) ? fresh : [])
     } catch (e) { setAddYearErr(e.message) }
     finally { setAddYearSaving(false); setYearsLoading(false) }
   }
@@ -420,7 +421,7 @@ export default function Finance() {
         termName: addTermName, startDate: addTermStart, endDate: addTermEnd,
         feePercentage: addTermPct ? Number(addTermPct) : null,
       })
-      setTerms(ts => [...ts, t])
+      if (t) setTerms(ts => [...ts, t])
       setAddTermOpen(false); setAddTermName(''); setAddTermStart(''); setAddTermEnd(''); setAddTermPct('')
     } catch (e) { setAddTermErr(e.message) }
     finally { setAddTermSaving(false) }
@@ -485,6 +486,12 @@ export default function Finance() {
       {/* ── Fee Lookup ── */}
       {tab === 'lookup' && (
         <>
+          {/* Success message lives outside the bar: a successful bulk action clears the selection, which hides the bar */}
+          {bulkMsg && (
+            <div role="status" style={{ background: 'var(--green-light, #e8f5ec)', color: 'var(--green)', border: '1px solid var(--green)',
+              borderRadius: 'var(--radius)', padding: '10px 14px', fontSize: 13, fontWeight: 600, marginBottom: 12 }}>✓ {bulkMsg}</div>
+          )}
+
           {/* Bulk action bar */}
           {selectedIds.size > 0 && (
             <div style={{ background: 'var(--blue-light)', border: '1px solid var(--blue)', borderRadius: 'var(--radius)', padding: '10px 16px', marginBottom: 14 }}>
@@ -537,7 +544,6 @@ export default function Finance() {
                 )
               })()}
 
-              {bulkMsg && <div style={{ color: 'var(--green)', fontSize: 13, fontWeight: 600, marginTop: 8 }}>✓ {bulkMsg}</div>}
               {bulkErr && <div style={{ color: 'var(--red)', fontSize: 13, marginTop: 8 }}>⚠ {bulkErr}</div>}
             </div>
           )}

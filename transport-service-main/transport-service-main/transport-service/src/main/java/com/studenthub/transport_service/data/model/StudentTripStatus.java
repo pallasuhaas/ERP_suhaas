@@ -1,6 +1,7 @@
 package com.studenthub.transport_service.data.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -27,10 +28,12 @@ public class StudentTripStatus {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "pickup_status", nullable = false, length = 20)
+    @NotNull
     private PickupStatus pickupStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "dropoff_status", nullable = false, length = 20)
+    @NotNull
     private DropoffStatus dropoffStatus;
 
     @Column(name = "pickup_time")

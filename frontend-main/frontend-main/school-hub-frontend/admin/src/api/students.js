@@ -1,3 +1,6 @@
+import { splitCSVLine, splitCSVRows } from './csv'
+import { friendlyError, safeFetch } from './errors'
+
 const BASE = '/api/students'
 
 export async function getStudents() {
@@ -26,9 +29,12 @@ export async function updateStudent(id, student) {
   return res.json()
 }
 
+// BUG-010: an active student is archived; an archived one is removed for good only if no other
+// service still references it (otherwise the server answers 409 with the reason, shown to the user).
 export async function deleteStudent(id) {
-  const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' })
-  if (!res.ok) throw new Error('Failed to delete student')
+  const res = await safeFetch(`${BASE}/${id}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error(friendlyError(res.status, await res.text().catch(() => '')))
+  return res.json().catch(() => null)
 }
 
 export async function bulkCreateStudents(students) {
@@ -66,14 +72,13 @@ export function downloadTemplate() {
 // Parse a CSV text string into an array of validated row objects.
 // Each row has the Student API fields plus _row, _errors, _valid.
 export function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/)
+  const lines = splitCSVRows(text)
   if (lines.length < 2) return []
 
-  const rawHeaders = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\s+/g, '_'))
+  const rawHeaders = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'))
 
   return lines.slice(1).filter(l => l.trim()).map((line, idx) => {
-    // Handle quoted fields
-    const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''))
+    const values = splitCSVLine(line)
     const raw = {}
     rawHeaders.forEach((h, i) => { raw[h] = values[i] ?? '' })
 
@@ -112,13 +117,13 @@ export function parseCSV(text) {
 
 // ─── req helper (mirrors transport.js pattern) ────────────────────────────────
 async function req(url, opts = {}) {
-  const res = await fetch(url, {
+  const res = await safeFetch(url, {
     headers: { 'Content-Type': 'application/json', ...opts.headers },
     ...opts,
   })
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText)
-    throw new Error(text || res.statusText)
+    throw new Error(friendlyError(res.status, text))
   }
   const ct = res.headers.get('content-type') || ''
   return ct.includes('application/json') ? res.json() : null

@@ -1,6 +1,8 @@
 package com.studenthub.student_info_service.controllers;
 
+import jakarta.validation.Valid;
 import com.studenthub.student_info_service.data.model.Student;
+import com.studenthub.student_info_service.data.model.StudentStatus;
 import com.studenthub.student_info_service.dto.BulkUploadResponse;
 import com.studenthub.student_info_service.service.StudentService;
 import org.springframework.web.bind.annotation.*;
@@ -22,13 +24,18 @@ public class StudentController {
         return service.getAllStudents();
     }
 
+    @GetMapping("/archived")
+    public List<Student> getArchived() {
+        return service.getArchivedStudents();
+    }
+
     @GetMapping("/{id}")
     public Student getStudent(@PathVariable Long id) {
         return service.getStudentById(id);
     }
 
     @PostMapping
-    public Student createStudent(@RequestBody Student student) {
+    public Student createStudent(@Valid @RequestBody Student student) {
         return service.createStudent(student);
     }
 
@@ -38,12 +45,18 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable Long id, @RequestBody Student student) {
+    public Student updateStudent(@PathVariable Long id, @Valid @RequestBody Student student) {
         return service.updateStudent(id, student);
     }
 
+    @PatchMapping("/{id}/status")
+    public Student updateStatus(@PathVariable Long id, @RequestParam StudentStatus status) {
+        return service.updateStatus(id, status);
+    }
+
+    // BUG-010: archives an active student; permanently deletes an archived one if no other service references it
     @DeleteMapping("/{id}")
-    public void deleteStudent(@PathVariable Long id) {
-        service.deleteStudent(id);
+    public java.util.Map<String, Object> deleteStudent(@PathVariable Long id) {
+        return java.util.Map.of("studentId", id, "result", service.deleteStudent(id));
     }
 }

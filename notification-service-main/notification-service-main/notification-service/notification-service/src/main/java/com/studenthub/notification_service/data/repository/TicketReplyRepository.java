@@ -1,0 +1,11 @@
+package com.studenthub.notification_service.data.repository;
+
+import com.studenthub.notification_service.data.model.TicketReply;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface TicketReplyRepository extends JpaRepository<TicketReply, Long> {
+    List<TicketReply> findByTicketIdOrderBySentAtAscReplyIdAsc(Long ticketId);
+    void deleteByTicketId(Long ticketId);
+}

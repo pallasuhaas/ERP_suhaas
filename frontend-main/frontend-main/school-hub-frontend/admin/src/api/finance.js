@@ -1,13 +1,15 @@
+import { friendlyError, safeFetch } from './errors'
+
 const BASE = '/api'
 
 async function req(url, opts = {}) {
-  const res = await fetch(url, {
+  const res = await safeFetch(url, {
     headers: { 'Content-Type': 'application/json', ...opts.headers },
     ...opts,
   })
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText)
-    throw new Error(text || res.statusText)
+    throw new Error(friendlyError(res.status, text))
   }
   const ct = res.headers.get('content-type') || ''
   return ct.includes('application/json') ? res.json() : null

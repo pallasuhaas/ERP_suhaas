@@ -8,4 +8,5 @@ import java.util.List;
 public interface RouteStopRepository extends JpaRepository<RouteStop, Long> {
 
     List<RouteStop> findByRouteRouteIdOrderBySequenceOrder(Long routeId);
+    void deleteByRouteRouteId(Long routeId);
 }

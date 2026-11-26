@@ -1,6 +1,8 @@
 package com.studenthub.notification_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.notification_service.data.model.Notification;
+import com.studenthub.notification_service.dto.BroadcastRequest;
 import com.studenthub.notification_service.service.NotificationService;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,13 +39,18 @@ public class NotificationController {
     }
 
     @PostMapping
-    public Notification create(@RequestBody Notification notification) {
+    public Notification create(@Valid @RequestBody Notification notification) {
         return service.create(notification);
+    }
+
+    @PostMapping("/broadcast")
+    public List<Notification> broadcast(@Valid @RequestBody BroadcastRequest request) {
+        return service.broadcast(request);
     }
 
     @PutMapping("/{id}")
     public Notification update(@PathVariable Long id,
-                               @RequestBody Notification notification) {
+                               @Valid @RequestBody Notification notification) {
         return service.update(id, notification);
     }
 

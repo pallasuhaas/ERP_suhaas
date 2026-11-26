@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.transport_service.data.model.StudentTransportAssignment;
 import com.studenthub.transport_service.service.StudentTransportAssignmentService;
 import org.springframework.web.bind.annotation.*;
@@ -35,13 +36,13 @@ public class StudentTransportAssignmentController {
     public StudentTransportAssignment createAssignment(@RequestParam Long studentId,
                                                        @RequestParam Long routeId,
                                                        @RequestParam Long vehicleId,
-                                                       @RequestBody StudentTransportAssignment assignment) {
+                                                       @Valid @RequestBody StudentTransportAssignment assignment) {
         return service.createAssignment(studentId, routeId, vehicleId, assignment);
     }
 
     @PutMapping("/{id}")
     public StudentTransportAssignment updateAssignment(@PathVariable Long id,
-                                                       @RequestBody StudentTransportAssignment assignment) {
+                                                       @Valid @RequestBody StudentTransportAssignment assignment) {
         return service.updateAssignment(id, assignment);
     }
 

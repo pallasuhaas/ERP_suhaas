@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import styles from './Transport.module.css'
 import { getStudents } from '../api/students'
+import { splitCSVLine, splitCSVRows } from '../api/csv'
 import {
   getVehicles, createVehicle, deleteVehicle, updateVehicle,
   getDrivers, createDriver, deleteDriver, updateDriver,
@@ -128,10 +129,12 @@ function FleetTab({ vehicles, drivers, driverMap, loading, onReload }) {
   async function handleAddVehicle(e) {
     e.preventDefault()
     setVErr(null)
+    if (!vForm.registrationNumber.trim()) return setVErr('Registration number is required.')
+    if (!(Number(vForm.capacity) >= 1)) return setVErr('Capacity must be at least 1.')
     setVSaving(true)
     try {
       await createVehicle(vForm.driverId || null, {
-        registrationNumber: vForm.registrationNumber,
+        registrationNumber: vForm.registrationNumber.trim(),
         vehicleType: vForm.vehicleType,
         capacity: Number(vForm.capacity),
         status: vForm.status,
@@ -952,11 +955,16 @@ function EnrollTab({ assignments, students, vehicles, routes, studentMap, vehicl
     setErr(null)
     if (!form.studentId) return setErr('Please select a student.')
     if (!form.routeId)   return setErr('Please select a route.')
+    if (!form.vehicleId) return setErr('Please select a vehicle.')
+    const route = routes.find(r => String(r.routeId) === String(form.routeId))
+    const pickupPoint = form.pickupPoint.trim() || route?.startPoint || ''
+    const dropPoint   = form.dropPoint.trim()   || route?.endPoint   || ''
+    if (!pickupPoint || !dropPoint) return setErr('Enter pickup and drop stops (this route has no start/end point to use).')
     setSaving(true)
     try {
-      await createAssignment(form.studentId, form.routeId, form.vehicleId || null, {
-        pickupPoint: form.pickupPoint || null,
-        dropPoint: form.dropPoint || null,
+      await createAssignment(form.studentId, form.routeId, form.vehicleId, {
+        pickupPoint,
+        dropPoint,
         effectiveFrom: form.effectiveFrom,
         effectiveTo: form.effectiveTo || null,
       })
@@ -1015,22 +1023,26 @@ function EnrollTab({ assignments, students, vehicles, routes, studentMap, vehicl
                 )}
               </div>
               <div className="form-group"><label className="form-label">Route</label>
-                <select className="form-select" value={form.routeId} onChange={e => setForm(f => ({ ...f, routeId: e.target.value }))}>
+                <select className="form-select" value={form.routeId} onChange={e => {
+                  const routeId = e.target.value
+                  const linked = routes.find(r => String(r.routeId) === String(routeId))?.vehicle?.vehicleId
+                  setForm(f => ({ ...f, routeId, vehicleId: linked ? String(linked) : f.vehicleId }))
+                }}>
                   <option value="">— Select Route —</option>
                   {routes.map(r => <option key={r.routeId} value={r.routeId}>{r.routeName}</option>)}
                 </select>
               </div>
-              <div className="form-group"><label className="form-label">Vehicle (optional)</label>
+              <div className="form-group"><label className="form-label">Vehicle</label>
                 <select className="form-select" value={form.vehicleId} onChange={e => setForm(f => ({ ...f, vehicleId: e.target.value }))}>
                   <option value="">— Select Vehicle —</option>
                   {vehicles.map(v => <option key={v.vehicleId} value={v.vehicleId}>{v.registrationNumber} (Cap. {v.capacity})</option>)}
                 </select>
               </div>
               <div className="form-group"><label className="form-label">Pickup Stop</label>
-                <input className="form-input" placeholder="e.g. MG Nagar Stop" value={form.pickupPoint} onChange={e => setForm(f => ({ ...f, pickupPoint: e.target.value }))} />
+                <input className="form-input" placeholder="Default: route start" value={form.pickupPoint} onChange={e => setForm(f => ({ ...f, pickupPoint: e.target.value }))} />
               </div>
               <div className="form-group"><label className="form-label">Drop Stop</label>
-                <input className="form-input" placeholder="e.g. School Gate 1" value={form.dropPoint} onChange={e => setForm(f => ({ ...f, dropPoint: e.target.value }))} />
+                <input className="form-input" placeholder="Default: route end" value={form.dropPoint} onChange={e => setForm(f => ({ ...f, dropPoint: e.target.value }))} />
               </div>
               <div className="form-group"><label className="form-label">Effective From</label>
                 <input className="form-input" type="date" value={form.effectiveFrom} onChange={e => setForm(f => ({ ...f, effectiveFrom: e.target.value }))} />
@@ -1177,13 +1189,13 @@ function EnrollTab({ assignments, students, vehicles, routes, studentMap, vehicl
 }
 
 // ── Transport CSV Upload sub-component ───────────────────────────────────────
-const TRANSPORT_CSV_HEADERS = ['admission_number', 'route_name', 'pickup_point', 'drop_point', 'effective_from', 'transport_fee']
+const TRANSPORT_CSV_HEADERS = ['admission_number', 'route_name', 'vehicle_registration', 'pickup_point', 'drop_point', 'effective_from', 'transport_fee']
 
 function downloadTransportTemplate() {
   const rows = [
     TRANSPORT_CSV_HEADERS.join(','),
-    'DPS2024001,Route 1,Koramangala Bus Stop,School Main Gate,2024-06-01,1200',
-    'DPS2024002,Route 2,Indiranagar 100ft Road,School Side Gate,2024-06-01,1400',
+    'DPS2024001,Route 1,KA01AB1234,Koramangala Bus Stop,School Main Gate,2024-06-01,1200',
+    'DPS2024002,Route 2,KA01AB5678,Indiranagar 100ft Road,School Side Gate,2024-06-01,1400',
   ]
   const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)
@@ -1191,7 +1203,7 @@ function downloadTransportTemplate() {
   URL.revokeObjectURL(url)
 }
 
-function TransportCSVUpload({ students, routes, onDone }) {
+function TransportCSVUpload({ students, routes, vehicles, onDone }) {
   const [rows,      setRows]      = useState([])
   const [step,      setStep]      = useState('upload') // upload | preview | done
   const [uploading, setUploading] = useState(false)
@@ -1200,27 +1212,33 @@ function TransportCSVUpload({ students, routes, onDone }) {
 
   const studentByAdm = Object.fromEntries(students.map(s => [(s.admissionNumber || '').toLowerCase(), s]))
   const routeByName  = Object.fromEntries(routes.map(r => [(r.routeName || '').toLowerCase(), r]))
+  const vehicleByReg = Object.fromEntries(vehicles.map(v => [(v.registrationNumber || '').toLowerCase(), v]))
 
   function parseFile(file) {
     if (!file) return
     const reader = new FileReader()
     reader.onload = e => {
-      const lines = e.target.result.trim().split(/\r?\n/)
+      const lines = splitCSVRows(e.target.result)
       if (lines.length < 2) return alert('No data rows found.')
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\s+/g, '_'))
+      const headers = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'))
       const parsed = lines.slice(1).filter(l => l.trim()).map((line, idx) => {
-        const vals = line.split(',').map(v => v.trim())
+        const vals = splitCSVLine(line)
         const raw = {}
         headers.forEach((h, i) => { raw[h] = vals[i] || '' })
         const admKey  = (raw['admission_number'] || '').toLowerCase()
         const rteKey  = (raw['route_name'] || '').toLowerCase()
         const student = studentByAdm[admKey]
         const route   = routeByName[rteKey]
+        const vehReg  = raw['vehicle_registration'] || ''
+        const vehicle = vehicleByReg[vehReg.toLowerCase()]
+        const vehicleId = vehicle?.vehicleId ?? route?.vehicle?.vehicleId
         const errors  = []
         if (!raw['admission_number']) errors.push('admission_number required')
         else if (!student)            errors.push(`Student "${raw['admission_number']}" not found`)
         if (!raw['route_name'])       errors.push('route_name required')
         else if (!route)              errors.push(`Route "${raw['route_name']}" not found`)
+        if (vehReg && !vehicle)       errors.push(`Vehicle "${vehReg}" not found`)
+        else if (route && !vehicleId) errors.push('vehicle_registration required (route has no vehicle)')
         return {
           _row: idx + 2, _errors: errors, _valid: errors.length === 0,
           admissionNumber: raw['admission_number'],
@@ -1231,6 +1249,7 @@ function TransportCSVUpload({ students, routes, onDone }) {
           transportFee: parseFloat(raw['transport_fee']) || 0,
           studentId: student?.studentId,
           routeId:   route?.routeId,
+          vehicleId,
         }
       })
       setRows(parsed); setStep('preview')
@@ -1245,9 +1264,7 @@ function TransportCSVUpload({ students, routes, onDone }) {
     const saved = [], failed = []
     for (const r of valid) {
       try {
-        const route = routeByName[(r.routeName || '').toLowerCase()]
-        const vehicleId = route?.vehicle?.vehicleId || null
-        await createAssignment(r.studentId, r.routeId, vehicleId, {
+        await createAssignment(r.studentId, r.routeId, r.vehicleId, {
           pickupPoint: r.pickupPoint,
           dropPoint: r.dropPoint,
           effectiveFrom: r.effectiveFrom,
@@ -1303,7 +1320,7 @@ function TransportCSVUpload({ students, routes, onDone }) {
           <div className="upload-zone" onClick={() => fileRef.current?.click()} style={{ cursor: 'pointer' }}>
             <div className="upload-icon">🚌</div>
             <div className="upload-title">Drop CSV or click to browse</div>
-            <div className="upload-sub">Columns: admission_number, route_name, pickup_point, drop_point, effective_from, transport_fee</div>
+            <div className="upload-sub">Columns: admission_number, route_name, vehicle_registration, pickup_point, drop_point, effective_from, transport_fee</div>
             <input ref={fileRef} type="file" accept=".csv,.txt" style={{ display: 'none' }} onChange={e => parseFile(e.target.files[0])} />
           </div>
           <div className={styles.templateRowSmall}>

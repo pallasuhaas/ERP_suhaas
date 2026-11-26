@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.transport_service.data.model.StudentTripStatus;
 import com.studenthub.transport_service.service.StudentTripStatusService;
 import org.springframework.web.bind.annotation.*;
@@ -39,13 +40,13 @@ public class StudentTripStatusController {
     @PostMapping
     public StudentTripStatus createStatus(@RequestParam Long studentId,
                                           @RequestParam Long tripId,
-                                          @RequestBody StudentTripStatus status) {
+                                          @Valid @RequestBody StudentTripStatus status) {
         return service.createStatus(studentId, tripId, status);
     }
 
     @PutMapping("/{id}")
     public StudentTripStatus updateStatus(@PathVariable Long id,
-                                          @RequestBody StudentTripStatus status) {
+                                          @Valid @RequestBody StudentTripStatus status) {
         return service.updateStatus(id, status);
     }
 

@@ -2,6 +2,7 @@ package com.studenthub.payment_service.data.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDate;
 
@@ -35,15 +36,19 @@ public class FeeInvoice {
     private LocalDate invoiceDate;
 
     @Column(name = "due_date", nullable = false)
+    @NotNull
     private LocalDate dueDate;
 
     @Column(name = "total_amount", nullable = false)
+    @PositiveOrZero
     private Double totalAmount;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
+    @NotNull
     private InvoiceStatus status;
 
     @Column(name = "discount_applied")
+    @PositiveOrZero
     private Double discountApplied;
 }

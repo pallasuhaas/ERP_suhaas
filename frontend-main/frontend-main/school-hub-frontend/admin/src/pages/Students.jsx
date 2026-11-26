@@ -12,6 +12,22 @@ import { getRoutes, getVehicles, createAssignment, getAssignments } from '../api
 const GENDERS = ['Male', 'Female', 'Other']
 const TODAY = new Date().toISOString().split('T')[0]
 
+// Shared validation for the Add and Edit student forms. Returns an error message, or null if valid.
+// phones: parent/guardian numbers to check (blank ones are skipped).
+function studentFormError(s, phones = []) {
+  if (!String(s.firstName ?? '').trim() || !String(s.lastName ?? '').trim() || !String(s.admissionNumber ?? '').trim())
+    return 'First name, last name and admission number are required.'
+  const localToday = new Date().toLocaleDateString('en-CA') // YYYY-MM-DD in local time
+  if (!/^\d+$/.test(String(s.gradeLevel ?? '').trim())) return 'Grade must be a number (e.g. 8).'
+  if (!s.dateOfBirth || String(s.dateOfBirth).slice(0, 10) >= localToday) return 'Date of birth must be in the past.'
+  if (s.admissionDate && String(s.admissionDate).slice(0, 10) > localToday) return 'Admission date cannot be in the future.'
+  for (const ph of phones) {
+    const p = String(ph ?? '').replace(/[\s-]/g, '')
+    if (p && !/^\d{10}$/.test(p)) return 'Parent phone must be 10 digits.'
+  }
+  return null
+}
+
 // ── Guardian API helpers ─────────────────────────────────────────────────────
 async function getGuardiansByStudent(studentId) {
   const res = await fetch(`/api/guardians/student/${studentId}`)
@@ -95,6 +111,8 @@ export default function Students() {
   const [bulkGrade,      setBulkGrade]      = useState('')
   const [bulkRouteId,    setBulkRouteId]    = useState('')
   const [bulkVehicleId,  setBulkVehicleId]  = useState('')
+  const [bulkPickup,     setBulkPickup]     = useState('')
+  const [bulkDrop,       setBulkDrop]       = useState('')
   const [bulkNewGrade,   setBulkNewGrade]   = useState('')
   const [bulkNewSection, setBulkNewSection] = useState('')
   const [bulkSaving,     setBulkSaving]     = useState(false)
@@ -271,14 +289,20 @@ export default function Students() {
 
   async function handleBulkAssignRoute() {
     if (!bulkRouteId || !bulkVehicleId) return setBulkErr('Select both a route and vehicle.')
+    const route = routes.find(r => String(r.routeId) === String(bulkRouteId))
+    const pickupPoint = bulkPickup.trim() || route?.startPoint || ''
+    const dropPoint   = bulkDrop.trim()   || route?.endPoint   || ''
+    if (!pickupPoint || !dropPoint) return setBulkErr('Enter pickup and drop points (this route has no start/end point to use).')
     setBulkErr(null); setBulkSaving(true)
     try {
       await Promise.all(selected.map(sid => createAssignment(sid, bulkRouteId, bulkVehicleId, {
+        pickupPoint,
+        dropPoint,
         effectiveFrom: new Date().toISOString().slice(0, 10),
         effectiveTo: null,
       })))
       setBulkMsg(`Transport assigned to ${selected.length} students.`)
-      setBulkRouteId(''); setBulkVehicleId(''); setSelected([])
+      setBulkRouteId(''); setBulkVehicleId(''); setBulkPickup(''); setBulkDrop(''); setSelected([])
       setTimeout(() => setBulkMsg(null), 3000)
     } catch (e) { setBulkErr(e.message) }
     finally { setBulkSaving(false) }
@@ -307,10 +331,8 @@ export default function Students() {
 
   // ── Add student ───────────────────────────────────────────────────────────────
   async function handleSaveStudent() {
-    if (!formData.firstName || !formData.lastName || !formData.admissionNumber) {
-      setFormError('First name, last name and admission number are required.')
-      return
-    }
+    const invalid = studentFormError(formData, [addParentPhone])
+    if (invalid) { setFormError(invalid); return }
     setSaving(true)
     setFormError(null)
     try {
@@ -387,6 +409,8 @@ export default function Students() {
 
   async function handleSaveEdit() {
     setEditError(null)
+    const invalid = studentFormError(editForm, editGuardians.flatMap(g => [g.phone, g.alternatePhone]))
+    if (invalid) { setEditError(invalid); return }
     setEditSaving(true)
     try {
       const {
@@ -688,15 +712,16 @@ export default function Students() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
-          {students.length > 0 && (
+          {/* BUG-010: students are soft-deleted, so this archives (restorable from the Archived tab) */}
+          {activeStudents.length > 0 && (
             <button className="btn-danger" onClick={async () => {
-              if (!window.confirm(`Delete all ${students.length} students? This cannot be undone.`)) return
+              if (!window.confirm(`Archive all ${activeStudents.length} active students? They move to the Archived tab and can be restored.`)) return
               try {
-                await Promise.all(students.map(s => deleteStudent(s.studentId)))
+                await Promise.all(activeStudents.map(s => updateStudentStatus(s.studentId, 'ARCHIVED')))
                 await loadStudents()
-              } catch { alert('Some deletions failed.') }
+              } catch (e) { alert('Some students could not be archived: ' + e.message) }
             }}>
-              🗑 Delete All
+              🗄 Archive All
             </button>
           )}
           <button className="btn-secondary" onClick={() => { setTab('bulk'); resetUpload() }}>
@@ -802,6 +827,12 @@ export default function Students() {
             </div>
           )}
 
+          {/* Success message lives outside the bar: a successful bulk action clears the selection, which hides the bar */}
+          {bulkMsg && (
+            <div role="status" style={{ background: 'var(--green-light, #e8f5ec)', color: 'var(--green)', border: '1px solid var(--green)',
+              borderRadius: 'var(--radius)', padding: '10px 14px', fontSize: 13, fontWeight: 600, marginBottom: 12 }}>✓ {bulkMsg}</div>
+          )}
+
           {/* Bulk action bar */}
           {selected.length > 0 && (
             <div style={{ background: 'var(--blue-light)', border: '1px solid var(--blue)', borderRadius: 'var(--radius)', padding: '12px 16px', marginBottom: 14 }}>
@@ -810,7 +841,6 @@ export default function Students() {
                 <button className="btn-ghost" style={{ fontSize: 12 }} onClick={() => setSelected([])}>✕ Clear</button>
                 <button className="btn-danger" style={{ marginLeft: 'auto' }} onClick={handleDeleteSelected}>🗄 Archive Selected</button>
               </div>
-              {bulkMsg && <div style={{ color: 'var(--green)', fontSize: 13, fontWeight: 600, marginBottom: 8 }}>✓ {bulkMsg}</div>}
               {bulkErr && <div style={{ color: 'var(--red)', fontSize: 13, marginBottom: 8 }}>⚠ {bulkErr}</div>}
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -849,6 +879,10 @@ export default function Students() {
                     <option value="">— Vehicle —</option>
                     {vehicles.map(v => <option key={v.vehicleId} value={v.vehicleId}>{v.registrationNumber}</option>)}
                   </select>
+                  <input className="filter-select" placeholder="Pickup (default: route start)" value={bulkPickup}
+                    onChange={e => setBulkPickup(e.target.value)} style={{ width: 190 }} />
+                  <input className="filter-select" placeholder="Drop (default: route end)" value={bulkDrop}
+                    onChange={e => setBulkDrop(e.target.value)} style={{ width: 180 }} />
                   <button className="btn-primary" onClick={handleBulkAssignRoute} disabled={bulkSaving || !bulkRouteId || !bulkVehicleId}>
                     {bulkSaving ? '…' : 'Assign'}
                   </button>
@@ -1107,7 +1141,7 @@ export default function Students() {
                               try {
                                 await deleteStudent(s.studentId)
                                 setArchivedStudents(prev => prev.filter(a => a.studentId !== s.studentId))
-                              } catch { alert('Delete failed.') }
+                              } catch (e) { alert('Not deleted: ' + e.message) }
                             }}
                           >
                             Delete Permanently

@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.student_info_service.data.model.Enrollment;
 import com.studenthub.student_info_service.service.EnrollmentService;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class EnrollmentController {
 
     @PostMapping("/student/{studentId}")
     public Enrollment createEnrollment(@PathVariable Long studentId,
-                                       @RequestBody Enrollment enrollment) {
+                                       @Valid @RequestBody Enrollment enrollment) {
         return service.createEnrollment(studentId, enrollment);
     }
 
     @PutMapping("/{id}")
     public Enrollment updateEnrollment(@PathVariable Long id,
-                                       @RequestBody Enrollment enrollment) {
+                                       @Valid @RequestBody Enrollment enrollment) {
         return service.updateEnrollment(id, enrollment);
     }
 

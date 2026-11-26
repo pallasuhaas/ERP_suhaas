@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.transport_service.data.model.Vehicle;
 import com.studenthub.transport_service.service.VehicleService;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class VehicleController {
 
     @PostMapping
     public Vehicle createVehicle(@RequestParam(required = false) Long driverId,
-                                 @RequestBody Vehicle vehicle) {
+                                 @Valid @RequestBody Vehicle vehicle) {
         return service.createVehicle(driverId, vehicle);
     }
 
     @PutMapping("/{id}")
     public Vehicle updateVehicle(@PathVariable Long id,
-                                 @RequestBody Vehicle vehicle) {
+                                 @Valid @RequestBody Vehicle vehicle) {
         return service.updateVehicle(id, vehicle);
     }
 

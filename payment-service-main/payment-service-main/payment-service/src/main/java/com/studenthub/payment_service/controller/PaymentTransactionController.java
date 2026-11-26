@@ -1,5 +1,6 @@
 package com.studenthub.payment_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.payment_service.data.model.PaymentTransaction;
 import com.studenthub.payment_service.service.PaymentTransactionService;
 import org.springframework.web.bind.annotation.*;
@@ -33,13 +34,13 @@ public class PaymentTransactionController {
 
     @PostMapping
     public PaymentTransaction create(@RequestParam Long invoiceId,
-                                     @RequestBody PaymentTransaction transaction) {
+                                     @Valid @RequestBody PaymentTransaction transaction) {
         return service.create(invoiceId, transaction);
     }
 
     @PutMapping("/{id}")
     public PaymentTransaction update(@PathVariable Long id,
-                                     @RequestBody PaymentTransaction transaction) {
+                                     @Valid @RequestBody PaymentTransaction transaction) {
         return service.update(id, transaction);
     }
 

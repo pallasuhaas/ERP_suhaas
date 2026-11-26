@@ -142,6 +142,82 @@
 
 ---
 
+## 2026-11-21 → 2026-11-25 — Admin-role bug fixes (BUGS-BY-ROLE.md, section 1)
+
+**Approved by:** developer (pallasuhaas) — each fix requested explicitly, bug by bug, from `BUGS-BY-ROLE.md`
+**Branches / PRs:** BUG-003 (PR #2), BUG-004/005/013 (PR #3), the rest on `bug-5`
+
+### payment-service
+| Bug | Files | Change |
+|-----|-------|--------|
+| BUG-003 | `config/WebClientConfig.java` | `baseUrl` now read from `student.service.url` (default `http://localhost:8091`) instead of the hardcoded Kubernetes name `http://student-info-service`. The Apr 10 entry above described this fix, but the code in the repo still had the hardcoded URL. |
+| BUG-005 | `data/model/FeeInvoice.java` | Added `@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})` (`PaymentTransaction.invoice` is a lazy proxy). Also re-applied to `FeeStructure.java` and `DiscountPolicy.java`. |
+| BUG-013 | `data/model/FeeType.java` | Added `REGISTRATION, BOOKS, UNIFORM, FOOD, ANNUAL_DAY` (the Admin UI already offered them). |
+| BUG-012 | `service/FeeInvoiceService.java` | `create()` now computes the discount. **Convention:** gross = `feeStructure.amount`, `discountApplied` = rupees taken off, `totalAmount` = net payable. The discount applies only when `invoiceDate` is within the policy's `validFrom..validTo` (inclusive). A missing `invoiceDate` defaults to today. |
+
+### student-info-service
+| Bug | Files | Change |
+|-----|-------|--------|
+| BUG-004 | `data/model/Student.java` | Added `@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})`. |
+| BUG-021 | `data/model/StudentStatus.java`, `data/repository/StudentRepository.java`, `service/StudentService.java`, `controllers/StudentController.java` | Added `ARCHIVED`; `PATCH /api/students/{id}/status?status=` and `GET /api/students/archived`. |
+
+### transport-service
+| Bug | Files | Change |
+|-----|-------|--------|
+| BUG-014 | `data/model/TransportRoute.java`, `controller/TransportRouteController.java`, `service/TransportRouteService.java` | Route has an optional lazy `vehicle` (`vehicle_id` FK). `POST`/`PUT /api/transport-routes` accept `?vehicleId=`; unknown id → error, omitted on PUT → vehicle kept. |
+
+### notification-service
+| Bug | Files | Change |
+|-----|-------|--------|
+| BUG-018a | `NotificationController.java`, `NotificationService.java`, `data/model/Notification.java`, `data/model/TriggerType.java`, new `dto/BroadcastRequest.java` | `POST /api/notifications/broadcast` `{studentIds, triggerType, title, message}` → one SENT notification per distinct student (recipient PARENT). Added nullable `title` column and trigger types `GENERAL, FEE_REMINDER, FEE_OVERDUE, PAYMENT_CONFIRMED`. 400 on empty list / blank or >500-char message. |
+| BUG-018b | new `ChatThread`, `ChatMessage`, `ChatDepartment`, `ThreadStatus`, `SenderType`, repositories, `ChatService`, `ChatController`, `dto/NewThreadRequest`, `dto/NewMessageRequest` | `GET /api/chat`, `GET /api/chat/student/{id}`, `POST /api/chat` (admin create), `POST /api/chat/student/{id}` (parent get-or-create by department; body or query params), `GET`/`POST /api/chat/{threadId}/messages`, `PATCH /api/chat/{threadId}/read-admin` and `/read-parent`. Sending bumps `lastMessageAt` and the other side's unread count. |
+| BUG-018c | new `SupportTicket`, `TicketReply`, `TicketStatus`, repositories, `SupportTicketService`, `SupportTicketController`, `dto/NewTicketRequest` | `GET /api/tickets`, `GET /api/tickets/{id}`, `GET /api/tickets/student/{id}`, `POST /api/tickets`, `POST /api/tickets/student/{id}` (parent), `GET`/`POST /api/tickets/{id}/replies`, `PATCH /api/tickets/{id}/status?status=`, `DELETE /api/tickets/{id}` (also deletes replies). First admin reply moves OPEN → IN_PROGRESS; reply on CLOSED → 409. Unknown ids → 404. |
+
+### Database changes (applied automatically by `ddl-auto=update` on restart)
+* `student.status` enum gains `ARCHIVED`; `fee_structure.fee_type` enum gains the 5 new types.
+* `transport_route.vehicle_id` (nullable FK → `vehicle`).
+* `notification.title` (varchar 200); `notification.trigger_type` enum gains 4 values.
+* New tables: `chat_thread`, `chat_message`, `support_ticket`, `ticket_reply`.
+* Environments that do **not** run with `ddl-auto=update` need these applied manually.
+
+**Action needed:** restart all four services.
+
+**Not done (deferred):** BUG-020b — `/api/academic-years` and terms API in payment-service.
+
+---
+
+## 2026-11-25 — Platform bugs (BUGS-BY-ROLE.md, section 4): 011, 006, 009, 007, 008b, 010
+
+**Approved by:** developer (pallasuhaas) — "yes do it" to the proposed fixes, including the BUG-010 rule
+(block deletes with 409, soft-delete students)
+
+### All four services
+| Bug | Files | Change |
+|-----|-------|--------|
+| BUG-011 | new `config/CorsConfig.java` | `/api/**` allows origins from `app.cors.allowed-origins` (default `http://localhost:5173,5174,5175`), methods GET/POST/PUT/PATCH/DELETE/OPTIONS. The CorsConfig files described in the Apr 9 entry were not in the repo. **Production:** set `app.cors.allowed-origins` to the real portal URLs. Write requests from any other origin get 403. |
+| BUG-006 | new `exception/ResourceNotFoundException.java`, new `exception/GlobalExceptionHandler.java`, every `service/*Service.java` | "not found" throws `ResourceNotFoundException` → **404**. Handler returns `{timestamp, status, error, message, path}` for all errors. It also maps bad id/enum, missing `?param` and unreadable JSON → 400, and `ResponseStatusException` → its own status and reason. Deleting an unknown id → 404 (was a silent 200). |
+| BUG-009 | handler + `StudentService`, `UserAccountService`, `VehicleService`, `DriverService` | DB unique violation → **409** "A record with 'X' already exists.". Explicit pre-checks with clearer messages for admission number, username, vehicle registration and driver licence (values trimmed; driver name/licence/contact trimmed on save). |
+| BUG-007 | each `pom.xml` (+ `spring-boot-starter-validation`), entity request bodies, every controller (`@Valid @RequestBody`), handler | Bean Validation on client-supplied fields only (relations taken from the URL are not annotated). Missing/blank required field → **400** naming the field. A PUT missing required fields is rejected instead of nulling columns. Server-managed `Student.status` and `Notification.status/sentAt` are kept when omitted. NOT NULL / too-long DB errors → 400. |
+| BUG-008b | same entities + `DiscountPolicyService`, `EnrollmentService`, `TripSessionService`, `StudentTransportAssignmentService`, `GuardianService` | Ranges: fee amount > 0, discount 0–100 %, capacity ≥ 1, distance/time ≥ 0, lat ±90 / lng ±180, snapshot scores 0–100, `@Email`, DOB in the past, admission date not in the future, stop order ≥ 1. Cross-field: validTo ≥ validFrom, endDate ≥ startDate, endTime > startTime, effectiveTo ≥ effectiveFrom. Guardian phone stored as digits only and must be 10 digits when given. |
+
+### BUG-010 — deleting records that others depend on
+| Service | Rule |
+|---------|------|
+| payment | Fee structure / discount used by invoices, invoice with payment transactions → **409** "X is still used by N …". |
+| transport | Driver with vehicles; vehicle with routes/assignments/trips/tracking; route with assignments/trips; trip with student trip statuses → **409**. A route's **stops are deleted with the route** (they belong to it). |
+| student-info | **Soft delete.** `DELETE /api/students/{id}` on an active student → status `ARCHIVED` (response `{"result":"ARCHIVED"}`). On an already-archived student → removed for good with its guardians, addresses, contact info, enrollments, snapshots and user account. This only happens when payment/transport/notification hold no records for it (new `client/CrossServiceRecords.java`). Otherwise **409** listing what remains. If a service can't be reached → **503**, nothing deleted. New properties `payment.service.url`, `transport.service.url`, `notification.service.url`. |
+
+### payment-service extra
+* `client/StudentClient.java`: student-info 404 → "Student not found" 404. student-info unreachable → **503** (was 500).
+
+### Frontend (admin)
+* Bulk-bar success messages (Students, Finance) moved outside the bar so they are visible after the selection clears.
+* "🗑 Delete All" → "🗄 Archive All" (active students only, restorable). The Archived tab's "Delete Permanently" shows the server's reason when refused.
+
+**Action needed:** restart all four services. Hibernate may add unique constraints on existing columns at startup. If existing data has duplicate driver licences, clean them first.
+
+---
+
 ## Future Change Requests
 
 All future changes to any backend repo must be logged here with:
