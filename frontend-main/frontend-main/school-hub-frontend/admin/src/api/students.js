@@ -1,4 +1,4 @@
-import { splitCSVLine } from './csv'
+import { splitCSVLine, splitCSVRows } from './csv'
 import { friendlyError, safeFetch } from './errors'
 
 const BASE = '/api/students'
@@ -29,9 +29,12 @@ export async function updateStudent(id, student) {
   return res.json()
 }
 
+// BUG-010: an active student is archived; an archived one is removed for good only if no other
+// service still references it (otherwise the server answers 409 with the reason, shown to the user).
 export async function deleteStudent(id) {
-  const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' })
-  if (!res.ok) throw new Error('Failed to delete student')
+  const res = await safeFetch(`${BASE}/${id}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error(friendlyError(res.status, await res.text().catch(() => '')))
+  return res.json().catch(() => null)
 }
 
 export async function bulkCreateStudents(students) {
@@ -69,7 +72,7 @@ export function downloadTemplate() {
 // Parse a CSV text string into an array of validated row objects.
 // Each row has the Student API fields plus _row, _errors, _valid.
 export function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/)
+  const lines = splitCSVRows(text)
   if (lines.length < 2) return []
 
   const rawHeaders = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'))

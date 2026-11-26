@@ -486,6 +486,12 @@ export default function Finance() {
       {/* ── Fee Lookup ── */}
       {tab === 'lookup' && (
         <>
+          {/* Success message lives outside the bar: a successful bulk action clears the selection, which hides the bar */}
+          {bulkMsg && (
+            <div role="status" style={{ background: 'var(--green-light, #e8f5ec)', color: 'var(--green)', border: '1px solid var(--green)',
+              borderRadius: 'var(--radius)', padding: '10px 14px', fontSize: 13, fontWeight: 600, marginBottom: 12 }}>✓ {bulkMsg}</div>
+          )}
+
           {/* Bulk action bar */}
           {selectedIds.size > 0 && (
             <div style={{ background: 'var(--blue-light)', border: '1px solid var(--blue)', borderRadius: 'var(--radius)', padding: '10px 16px', marginBottom: 14 }}>
@@ -538,7 +544,6 @@ export default function Finance() {
                 )
               })()}
 
-              {bulkMsg && <div style={{ color: 'var(--green)', fontSize: 13, fontWeight: 600, marginTop: 8 }}>✓ {bulkMsg}</div>}
               {bulkErr && <div style={{ color: 'var(--red)', fontSize: 13, marginTop: 8 }}>⚠ {bulkErr}</div>}
             </div>
           )}

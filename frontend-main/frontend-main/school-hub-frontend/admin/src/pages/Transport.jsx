@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import styles from './Transport.module.css'
 import { getStudents } from '../api/students'
-import { splitCSVLine } from '../api/csv'
+import { splitCSVLine, splitCSVRows } from '../api/csv'
 import {
   getVehicles, createVehicle, deleteVehicle, updateVehicle,
   getDrivers, createDriver, deleteDriver, updateDriver,
@@ -955,11 +955,16 @@ function EnrollTab({ assignments, students, vehicles, routes, studentMap, vehicl
     setErr(null)
     if (!form.studentId) return setErr('Please select a student.')
     if (!form.routeId)   return setErr('Please select a route.')
+    if (!form.vehicleId) return setErr('Please select a vehicle.')
+    const route = routes.find(r => String(r.routeId) === String(form.routeId))
+    const pickupPoint = form.pickupPoint.trim() || route?.startPoint || ''
+    const dropPoint   = form.dropPoint.trim()   || route?.endPoint   || ''
+    if (!pickupPoint || !dropPoint) return setErr('Enter pickup and drop stops (this route has no start/end point to use).')
     setSaving(true)
     try {
-      await createAssignment(form.studentId, form.routeId, form.vehicleId || null, {
-        pickupPoint: form.pickupPoint || null,
-        dropPoint: form.dropPoint || null,
+      await createAssignment(form.studentId, form.routeId, form.vehicleId, {
+        pickupPoint,
+        dropPoint,
         effectiveFrom: form.effectiveFrom,
         effectiveTo: form.effectiveTo || null,
       })
@@ -1018,22 +1023,26 @@ function EnrollTab({ assignments, students, vehicles, routes, studentMap, vehicl
                 )}
               </div>
               <div className="form-group"><label className="form-label">Route</label>
-                <select className="form-select" value={form.routeId} onChange={e => setForm(f => ({ ...f, routeId: e.target.value }))}>
+                <select className="form-select" value={form.routeId} onChange={e => {
+                  const routeId = e.target.value
+                  const linked = routes.find(r => String(r.routeId) === String(routeId))?.vehicle?.vehicleId
+                  setForm(f => ({ ...f, routeId, vehicleId: linked ? String(linked) : f.vehicleId }))
+                }}>
                   <option value="">— Select Route —</option>
                   {routes.map(r => <option key={r.routeId} value={r.routeId}>{r.routeName}</option>)}
                 </select>
               </div>
-              <div className="form-group"><label className="form-label">Vehicle (optional)</label>
+              <div className="form-group"><label className="form-label">Vehicle</label>
                 <select className="form-select" value={form.vehicleId} onChange={e => setForm(f => ({ ...f, vehicleId: e.target.value }))}>
                   <option value="">— Select Vehicle —</option>
                   {vehicles.map(v => <option key={v.vehicleId} value={v.vehicleId}>{v.registrationNumber} (Cap. {v.capacity})</option>)}
                 </select>
               </div>
               <div className="form-group"><label className="form-label">Pickup Stop</label>
-                <input className="form-input" placeholder="e.g. MG Nagar Stop" value={form.pickupPoint} onChange={e => setForm(f => ({ ...f, pickupPoint: e.target.value }))} />
+                <input className="form-input" placeholder="Default: route start" value={form.pickupPoint} onChange={e => setForm(f => ({ ...f, pickupPoint: e.target.value }))} />
               </div>
               <div className="form-group"><label className="form-label">Drop Stop</label>
-                <input className="form-input" placeholder="e.g. School Gate 1" value={form.dropPoint} onChange={e => setForm(f => ({ ...f, dropPoint: e.target.value }))} />
+                <input className="form-input" placeholder="Default: route end" value={form.dropPoint} onChange={e => setForm(f => ({ ...f, dropPoint: e.target.value }))} />
               </div>
               <div className="form-group"><label className="form-label">Effective From</label>
                 <input className="form-input" type="date" value={form.effectiveFrom} onChange={e => setForm(f => ({ ...f, effectiveFrom: e.target.value }))} />
@@ -1209,7 +1218,7 @@ function TransportCSVUpload({ students, routes, vehicles, onDone }) {
     if (!file) return
     const reader = new FileReader()
     reader.onload = e => {
-      const lines = e.target.result.trim().split(/\r?\n/)
+      const lines = splitCSVRows(e.target.result)
       if (lines.length < 2) return alert('No data rows found.')
       const headers = splitCSVLine(lines[0]).map(h => h.toLowerCase().replace(/\s+/g, '_'))
       const parsed = lines.slice(1).filter(l => l.trim()).map((line, idx) => {

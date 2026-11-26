@@ -2,6 +2,7 @@ import { useState } from 'react'
 import AdminLogin from './components/AdminLogin'
 import AdminSidebar from './components/AdminSidebar'
 import AdminHeader from './components/AdminHeader'
+import ErrorBoundary from './components/ErrorBoundary'
 import Dashboard from './pages/Dashboard'
 import Students from './pages/Students'
 import Finance from './pages/Finance'
@@ -47,7 +48,9 @@ export default function App() {
       <div className={styles.body}>
         <AdminHeader title={PAGE_TITLES[currentPage]} onNavigate={handleNavigate} />
         <main className={styles.main}>
-          <PageComponent onNavigate={handleNavigate} />
+          <ErrorBoundary key={currentPage}>
+            <PageComponent onNavigate={handleNavigate} />
+          </ErrorBoundary>
         </main>
       </div>
     </div>

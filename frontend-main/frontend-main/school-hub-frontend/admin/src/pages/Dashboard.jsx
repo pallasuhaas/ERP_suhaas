@@ -3,6 +3,7 @@ import styles from './Dashboard.module.css'
 import { getStudents } from '../api/students'
 import { getInvoices } from '../api/finance'
 import { getVehicles, getRoutes } from '../api/transport'
+import { getAllTickets } from '../api/communications'
 
 function formatINR(n) {
   if (n >= 100000) return `₹${(n / 100000).toFixed(1)}L`
@@ -20,6 +21,7 @@ const QUICK = [
 export default function Dashboard({ onNavigate }) {
   const [data, setData] = useState({
     students: null, collected: null, outstanding: null, routes: null, vehicles: null,
+    tickets: undefined, // undefined = loading, null = unavailable, else { open, inProgress }
   })
   const [recentStudents, setRecentStudents] = useState([])
   const [recentVehicles, setRecentVehicles] = useState([])
@@ -30,7 +32,9 @@ export default function Dashboard({ onNavigate }) {
       getInvoices().catch(() => []),
       getVehicles().catch(() => []),
       getRoutes().catch(() => []),
-    ]).then(([students, invoices, vehicles, routes]) => {
+      getAllTickets().catch(() => null),
+    ]).then(([students, invoices, vehicles, routes, tickets]) => {
+      const activeStudents = students.filter(s => s.status !== 'ARCHIVED')
       const collected = invoices
         .filter(i => i.status === 'PAID')
         .reduce((s, i) => s + (i.totalAmount || 0), 0)
@@ -38,13 +42,16 @@ export default function Dashboard({ onNavigate }) {
         .filter(i => i.status !== 'PAID')
         .reduce((s, i) => s + (i.totalAmount || 0), 0)
       setData({
-        students: students.length,
+        students: activeStudents.length,
         collected,
         outstanding,
         routes: routes.length,
         vehicles: vehicles.length,
+        tickets: Array.isArray(tickets)
+          ? { open: tickets.filter(t => t.status === 'OPEN').length, inProgress: tickets.filter(t => t.status === 'IN_PROGRESS').length }
+          : null,
       })
-      setRecentStudents(students.slice(-5).reverse())
+      setRecentStudents(activeStudents.slice(-5).reverse())
       setRecentVehicles(vehicles.slice(0, 3))
     })
   }, [])
@@ -53,7 +60,9 @@ export default function Dashboard({ onNavigate }) {
     { label: 'Fee Collected', value: data.collected !== null ? formatINR(data.collected) : '…', icon: '💰', color: 'green',  trend: data.collected !== null ? `${data.collected === 0 ? 'No payments yet' : 'Paid invoices total'}` : '' },
     { label: 'Outstanding',   value: data.outstanding !== null ? formatINR(data.outstanding) : '…', icon: '⏳', color: 'orange', trend: data.outstanding !== null ? `${data.outstanding === 0 ? 'All clear' : 'Pending / unpaid'}` : '' },
     { label: 'Active Routes', value: data.routes !== null ? String(data.routes) : '…', icon: '🚌', color: 'blue',   trend: data.routes !== null ? (data.routes === 0 ? 'None created yet' : `Routes configured`) : '' },
-    { label: 'Open Tickets',  value: '—',  icon: '🎫', color: 'red',    trend: 'Ticket system coming soon' },
+    { label: 'Open Tickets',  value: data.tickets === undefined ? '…' : data.tickets === null ? '—' : String(data.tickets.open + data.tickets.inProgress), icon: '🎫', color: 'red',
+      trend: data.tickets === undefined ? '' : data.tickets === null ? 'Ticket service unavailable'
+        : (data.tickets.open + data.tickets.inProgress === 0 ? 'No open tickets' : `${data.tickets.open} new · ${data.tickets.inProgress} in progress`) },
     { label: 'Total Students',value: data.students !== null ? String(data.students) : '…', icon: '👥', color: 'teal',   trend: data.students !== null ? (data.students === 0 ? 'No students yet' : `Enrolled students`) : '' },
   ]
 
