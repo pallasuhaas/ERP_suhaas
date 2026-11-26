@@ -215,7 +215,8 @@ export default function TransportAnalytics() {
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
             <div className={styles.mapHeader}>
               <span className={styles.mapTitle}>Real-Time Fleet Map</span>
-              <span className={styles.liveBadge}><span className={styles.liveDot} />LIVE</span>
+              {/* BUG-024: no GPS feed is connected; the pins are placeholders */}
+              <span className={styles.liveBadge} title="Placeholder map: GPS feed not connected yet">PREVIEW</span>
             </div>
             <div className={styles.mapArea}>
               <div className={styles.mapGrid} />
