@@ -108,7 +108,7 @@ export default function Documents() {
       {/* Downloadable reports section */}
       <div className="card" style={{ marginTop: 20 }}>
         <div className={styles.cardTitle}>Auto-Generated Reports</div>
-        <div className={styles.cardSub}>Reports generated on demand from live data. Click to generate and download.</div>
+        <div className={styles.cardSub}>Report generation isn't connected yet. Each report will be generated from its endpoint below.</div>
         <div className={styles.reportGrid}>
           {[
             { label: 'Fee Collection Summary',      icon: '💰', api: '/api/reports/fee-summary',      format: 'PDF / Excel' },
