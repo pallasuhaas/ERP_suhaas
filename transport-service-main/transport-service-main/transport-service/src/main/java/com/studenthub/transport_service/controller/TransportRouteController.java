@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.transport_service.data.model.TransportRoute;
 import com.studenthub.transport_service.service.TransportRouteService;
 import org.springframework.web.bind.annotation.*;
@@ -27,14 +28,14 @@ public class TransportRouteController {
     }
 
     @PostMapping
-    public TransportRoute createRoute(@RequestBody TransportRoute route,
+    public TransportRoute createRoute(@Valid @RequestBody TransportRoute route,
                                       @RequestParam(required = false) Long vehicleId) {
         return service.createRoute(route, vehicleId);
     }
 
     @PutMapping("/{id}")
     public TransportRoute updateRoute(@PathVariable Long id,
-                                      @RequestBody TransportRoute route,
+                                      @Valid @RequestBody TransportRoute route,
                                       @RequestParam(required = false) Long vehicleId) {
         return service.updateRoute(id, route, vehicleId);
     }

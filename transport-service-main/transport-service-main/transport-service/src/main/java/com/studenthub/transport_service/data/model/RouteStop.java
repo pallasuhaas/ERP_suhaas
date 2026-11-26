@@ -1,6 +1,7 @@
 package com.studenthub.transport_service.data.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
@@ -22,8 +23,12 @@ public class RouteStop {
     private TransportRoute route;
 
     @Column(name = "stop_name", nullable = false, length = 150)
+    @NotBlank
+    @Size(max = 150)
     private String stopName;
 
     @Column(name = "sequence_order", nullable = false)
+    @NotNull
+    @Min(1)
     private Integer sequenceOrder;
 }

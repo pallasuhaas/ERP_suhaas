@@ -2,6 +2,7 @@ package com.studenthub.student_info_service.data.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,27 +23,42 @@ public class Student {
     private Long studentId;
 
     @Column(name = "first_name", nullable = false, length = 100)
+    @NotBlank
+    @Size(max = 100)
     private String firstName;
 
     @Column(name = "last_name", nullable = false, length = 100)
+    @NotBlank
+    @Size(max = 100)
     private String lastName;
 
     @Column(name = "date_of_birth", nullable = false)
+    @NotNull
+    @Past(message = "must be in the past")
     private LocalDate dateOfBirth;
 
     @Column(name = "gender", nullable = false, length = 20)
+    @NotBlank
+    @Size(max = 20)
     private String gender;
 
     @Column(name = "admission_number", nullable = false, unique = true, length = 50)
+    @NotBlank
+    @Size(max = 50)
     private String admissionNumber;
 
     @Column(name = "admission_date", nullable = false)
+    @NotNull
+    @PastOrPresent(message = "cannot be in the future")
     private LocalDate admissionDate;
 
     @Column(name = "grade_level", nullable = false, length = 50)
+    @NotBlank
+    @Size(max = 50)
     private String gradeLevel;
 
     @Column(name = "section", length = 50)
+    @Size(max = 50)
     private String section;
 
     @Enumerated(EnumType.STRING)

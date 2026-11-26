@@ -2,6 +2,7 @@ package com.studenthub.transport_service.data.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -20,18 +21,24 @@ public class TransportRoute {
     private Long routeId;
 
     @Column(name = "route_name", nullable = false, length = 150)
+    @NotBlank
+    @Size(max = 150)
     private String routeName;
 
     @Column(name = "start_point", nullable = false, length = 150)
+    @Size(max = 150)
     private String startPoint;
 
     @Column(name = "end_point", nullable = false, length = 150)
+    @Size(max = 150)
     private String endPoint;
 
     @Column(name = "distance_km")
+    @PositiveOrZero
     private Double distanceKm;
 
     @Column(name = "estimated_time_minutes")
+    @PositiveOrZero
     private Integer estimatedTimeMinutes;
 
     @ManyToOne(fetch = FetchType.LAZY)

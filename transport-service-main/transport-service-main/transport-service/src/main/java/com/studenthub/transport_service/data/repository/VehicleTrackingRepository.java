@@ -15,4 +15,5 @@ public interface VehicleTrackingRepository extends JpaRepository<VehicleTracking
             LocalDateTime start,
             LocalDateTime end
     );
+    long countByVehicleVehicleId(Long vehicleId);
 }

@@ -1,5 +1,6 @@
 package com.studenthub.notification_service.service;
 
+import com.studenthub.notification_service.exception.ResourceNotFoundException;
 import com.studenthub.notification_service.data.model.*;
 import com.studenthub.notification_service.data.repository.NotificationRepository;
 import com.studenthub.notification_service.dto.BroadcastRequest;
@@ -26,7 +27,7 @@ public class NotificationService {
 
     public Notification getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Notification not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + id));
     }
 
     public List<Notification> getByStudent(Long studentId) {
@@ -86,8 +87,8 @@ public class NotificationService {
         existing.setTriggerType(updated.getTriggerType());
         existing.setRecipientType(updated.getRecipientType());
         existing.setLocationSnapshot(updated.getLocationSnapshot());
-        existing.setStatus(updated.getStatus());
-        existing.setSentAt(updated.getSentAt());
+        if (updated.getStatus() != null) existing.setStatus(updated.getStatus());
+        if (updated.getSentAt() != null) existing.setSentAt(updated.getSentAt());
 
         return repository.save(existing);
     }

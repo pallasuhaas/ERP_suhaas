@@ -1,5 +1,6 @@
 package com.studenthub.payment_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.payment_service.data.model.DiscountPolicy;
 import com.studenthub.payment_service.service.DiscountPolicyService;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +28,13 @@ public class DiscountPolicyController {
     }
 
     @PostMapping
-    public DiscountPolicy create(@RequestBody DiscountPolicy policy) {
+    public DiscountPolicy create(@Valid @RequestBody DiscountPolicy policy) {
         return service.create(policy);
     }
 
     @PutMapping("/{id}")
     public DiscountPolicy update(@PathVariable Long id,
-                                 @RequestBody DiscountPolicy policy) {
+                                 @Valid @RequestBody DiscountPolicy policy) {
         return service.update(id, policy);
     }
 

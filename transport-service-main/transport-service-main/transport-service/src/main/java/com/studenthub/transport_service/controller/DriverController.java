@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.transport_service.data.model.Driver;
 import com.studenthub.transport_service.service.DriverService;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +28,13 @@ public class DriverController {
     }
 
     @PostMapping
-    public Driver createDriver(@RequestBody Driver driver) {
+    public Driver createDriver(@Valid @RequestBody Driver driver) {
         return service.createDriver(driver);
     }
 
     @PutMapping("/{id}")
     public Driver updateDriver(@PathVariable Long id,
-                               @RequestBody Driver driver) {
+                               @Valid @RequestBody Driver driver) {
         return service.updateDriver(id, driver);
     }
 

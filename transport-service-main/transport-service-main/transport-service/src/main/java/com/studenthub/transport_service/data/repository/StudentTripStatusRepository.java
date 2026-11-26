@@ -10,4 +10,5 @@ public interface StudentTripStatusRepository extends JpaRepository<StudentTripSt
     List<StudentTripStatus> findByStudentId(Long studentId);
 
     List<StudentTripStatus> findByTripTripId(Long tripId);
+    long countByTripTripId(Long tripId);
 }

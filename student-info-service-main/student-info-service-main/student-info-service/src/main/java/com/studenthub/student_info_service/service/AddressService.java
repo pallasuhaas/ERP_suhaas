@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.service;
 
+import com.studenthub.student_info_service.exception.ResourceNotFoundException;
 import com.studenthub.student_info_service.data.model.Address;
 import com.studenthub.student_info_service.data.model.Student;
 import com.studenthub.student_info_service.data.repository.AddressRepository;
@@ -26,12 +27,12 @@ public class AddressService {
 
     public Address getAddressById(Long id) {
         return addressRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Address not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with id: " + id));
     }
 
     public Address createAddress(Long studentId, Address address) {
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
 
         address.setStudent(student);
         return addressRepository.save(address);

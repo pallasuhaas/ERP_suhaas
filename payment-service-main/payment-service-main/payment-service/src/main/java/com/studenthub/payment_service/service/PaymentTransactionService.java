@@ -1,5 +1,6 @@
 package com.studenthub.payment_service.service;
 
+import com.studenthub.payment_service.exception.ResourceNotFoundException;
 import com.studenthub.payment_service.data.model.*;
 import com.studenthub.payment_service.data.repository.FeeInvoiceRepository;
 import com.studenthub.payment_service.data.repository.PaymentTransactionRepository;
@@ -25,7 +26,7 @@ public class PaymentTransactionService {
 
     public PaymentTransaction getById(Long id) {
         return transactionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("PaymentTransaction not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("PaymentTransaction not found with id: " + id));
     }
 
     public List<PaymentTransaction> getByInvoice(Long invoiceId) {
@@ -35,7 +36,7 @@ public class PaymentTransactionService {
     public PaymentTransaction create(Long invoiceId, PaymentTransaction transaction) {
 
         FeeInvoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new RuntimeException("FeeInvoice not found with id: " + invoiceId));
+                .orElseThrow(() -> new ResourceNotFoundException("FeeInvoice not found with id: " + invoiceId));
 
         transaction.setInvoice(invoice);
 

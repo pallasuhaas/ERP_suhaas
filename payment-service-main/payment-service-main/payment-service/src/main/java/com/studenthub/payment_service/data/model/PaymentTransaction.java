@@ -1,6 +1,7 @@
 package com.studenthub.payment_service.data.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDate;
 
@@ -23,19 +24,25 @@ public class PaymentTransaction {
     private FeeInvoice invoice;
 
     @Column(name = "payment_date", nullable = false)
+    @NotNull
     private LocalDate paymentDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_mode", nullable = false, length = 20)
+    @NotNull
     private PaymentMode paymentMode;
 
     @Column(name = "amount_paid", nullable = false)
+    @NotNull
+    @Positive
     private Double amountPaid;
 
     @Column(name = "reference_number", length = 100)
+    @Size(max = 100)
     private String referenceNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
+    @NotNull
     private PaymentStatus status;
 }

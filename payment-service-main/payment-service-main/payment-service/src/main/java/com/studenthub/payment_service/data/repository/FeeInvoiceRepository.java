@@ -10,4 +10,6 @@ public interface FeeInvoiceRepository extends JpaRepository<FeeInvoice, Long> {
     List<FeeInvoice> findByStudentId(Long studentId);
 
     List<FeeInvoice> findByStatus(String status);
+    long countByFeeStructureFeeStructureId(Long feeStructureId);
+    long countByDiscountPolicyDiscountId(Long discountId);
 }

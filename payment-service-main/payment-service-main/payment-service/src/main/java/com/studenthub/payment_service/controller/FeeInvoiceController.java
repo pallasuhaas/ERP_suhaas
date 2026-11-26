@@ -1,5 +1,6 @@
 package com.studenthub.payment_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.payment_service.data.model.FeeInvoice;
 import com.studenthub.payment_service.service.FeeInvoiceService;
 import org.springframework.web.bind.annotation.*;
@@ -35,14 +36,14 @@ public class FeeInvoiceController {
     public FeeInvoice create(@RequestParam Long studentId,
                              @RequestParam Long feeStructureId,
                              @RequestParam(required = false) Long discountId,
-                             @RequestBody FeeInvoice invoice) {
+                             @Valid @RequestBody FeeInvoice invoice) {
 
         return service.create(studentId, feeStructureId, discountId, invoice);
     }
 
     @PutMapping("/{id}")
     public FeeInvoice update(@PathVariable Long id,
-                             @RequestBody FeeInvoice invoice) {
+                             @Valid @RequestBody FeeInvoice invoice) {
         return service.update(id, invoice);
     }
 

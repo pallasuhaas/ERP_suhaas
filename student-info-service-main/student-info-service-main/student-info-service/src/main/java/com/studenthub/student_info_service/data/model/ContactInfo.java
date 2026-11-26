@@ -1,6 +1,7 @@
 package com.studenthub.student_info_service.data.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Entity
@@ -18,12 +19,18 @@ public class ContactInfo {
     private Long contactId;
 
     @Column(name = "email", nullable = false, length = 150)
+    @NotBlank
+    @Email
+    @Size(max = 150)
     private String email;
 
     @Column(name = "phone", nullable = false, length = 50)
+    @NotBlank
+    @Size(max = 50)
     private String phone;
 
     @Column(name = "alternate_phone", length = 50)
+    @Size(max = 50)
     private String alternatePhone;
 
     @ManyToOne(fetch = FetchType.LAZY)

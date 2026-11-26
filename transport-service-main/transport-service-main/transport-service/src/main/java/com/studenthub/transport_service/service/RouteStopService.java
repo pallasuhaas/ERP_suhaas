@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.service;
 
+import com.studenthub.transport_service.exception.ResourceNotFoundException;
 import com.studenthub.transport_service.data.model.RouteStop;
 import com.studenthub.transport_service.data.model.TransportRoute;
 import com.studenthub.transport_service.data.repository.RouteStopRepository;
@@ -26,12 +27,12 @@ public class RouteStopService {
 
     public RouteStop getStopById(Long id) {
         return stopRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("RouteStop not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("RouteStop not found with id: " + id));
     }
 
     public RouteStop createStop(Long routeId, RouteStop stop) {
         TransportRoute route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RuntimeException("TransportRoute not found with id: " + routeId));
+                .orElseThrow(() -> new ResourceNotFoundException("TransportRoute not found with id: " + routeId));
 
         stop.setRoute(route);
         return stopRepository.save(stop);

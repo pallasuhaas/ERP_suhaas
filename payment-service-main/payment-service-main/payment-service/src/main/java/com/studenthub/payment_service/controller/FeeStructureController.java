@@ -1,5 +1,6 @@
 package com.studenthub.payment_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.payment_service.data.model.FeeStructure;
 import com.studenthub.payment_service.service.FeeStructureService;
 import org.springframework.web.bind.annotation.*;
@@ -27,13 +28,13 @@ public class FeeStructureController {
     }
 
     @PostMapping
-    public FeeStructure create(@RequestBody FeeStructure feeStructure) {
+    public FeeStructure create(@Valid @RequestBody FeeStructure feeStructure) {
         return service.create(feeStructure);
     }
 
     @PutMapping("/{id}")
     public FeeStructure update(@PathVariable Long id,
-                               @RequestBody FeeStructure feeStructure) {
+                               @Valid @RequestBody FeeStructure feeStructure) {
         return service.update(id, feeStructure);
     }
 

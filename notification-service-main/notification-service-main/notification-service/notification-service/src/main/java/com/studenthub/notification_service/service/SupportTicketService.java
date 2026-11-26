@@ -60,6 +60,12 @@ public class SupportTicketService {
                 .build());
     }
 
+    // Parent portal: the student comes from the URL, not the body
+    public SupportTicket createForStudent(Long studentId, NewTicketRequest req) {
+        NewTicketRequest r = req != null ? req : new NewTicketRequest(null, null, null, null, null);
+        return create(new NewTicketRequest(studentId, r.parentName(), r.category(), r.subject(), r.description()));
+    }
+
     public List<TicketReply> getReplies(Long ticketId) {
         getById(ticketId);
         return replyRepository.findByTicketIdOrderBySentAtAscReplyIdAsc(ticketId);

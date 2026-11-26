@@ -58,6 +58,15 @@ public class ChatService {
         return threadRepository.save(thread);
     }
 
+    // Parent portal: reuse the student's open thread for this department, or start a new one
+    public ChatThread getOrCreateThread(Long studentId, ChatDepartment department, String subject) {
+        ChatDepartment dept = department != null ? department : ChatDepartment.GENERAL;
+        return threadRepository
+                .findFirstByStudentIdAndDepartmentAndStatusOrderByLastMessageAtDesc(studentId, dept, ThreadStatus.OPEN)
+                .orElseGet(() -> createThread(new NewThreadRequest(studentId, dept,
+                        subject == null || subject.isBlank() ? dept.name() + " Enquiry" : subject)));
+    }
+
     public List<ChatMessage> getMessages(Long threadId) {
         getThread(threadId);
         return messageRepository.findByThreadIdOrderBySentAtAscMessageIdAsc(threadId);

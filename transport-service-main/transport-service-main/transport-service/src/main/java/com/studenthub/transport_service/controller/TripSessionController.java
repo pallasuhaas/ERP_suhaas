@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.transport_service.data.model.TripSession;
 import com.studenthub.transport_service.service.TripSessionService;
 import org.springframework.web.bind.annotation.*;
@@ -39,13 +40,13 @@ public class TripSessionController {
     @PostMapping
     public TripSession createTrip(@RequestParam Long vehicleId,
                                   @RequestParam Long routeId,
-                                  @RequestBody TripSession trip) {
+                                  @Valid @RequestBody TripSession trip) {
         return service.createTrip(vehicleId, routeId, trip);
     }
 
     @PutMapping("/{id}")
     public TripSession updateTrip(@PathVariable Long id,
-                                  @RequestBody TripSession trip) {
+                                  @Valid @RequestBody TripSession trip) {
         return service.updateTrip(id, trip);
     }
 

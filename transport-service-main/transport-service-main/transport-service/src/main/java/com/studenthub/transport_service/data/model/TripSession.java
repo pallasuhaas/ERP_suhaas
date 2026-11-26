@@ -2,6 +2,7 @@ package com.studenthub.transport_service.data.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,10 +31,12 @@ public class TripSession {
     private TransportRoute route;
 
     @Column(name = "trip_date", nullable = false)
+    @NotNull
     private LocalDate tripDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "trip_type", nullable = false, length = 20)
+    @NotNull
     private TripType tripType;
 
     @Column(name = "start_time")
@@ -44,5 +47,6 @@ public class TripSession {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
+    @NotNull
     private TripStatus status;
 }

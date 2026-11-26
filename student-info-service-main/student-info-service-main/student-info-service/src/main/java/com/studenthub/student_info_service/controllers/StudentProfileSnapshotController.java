@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.controllers;
 
+import jakarta.validation.Valid;
 import com.studenthub.student_info_service.data.model.StudentProfileSnapshot;
 import com.studenthub.student_info_service.service.StudentProfileSnapshotService;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class StudentProfileSnapshotController {
 
     @PostMapping("/student/{studentId}")
     public StudentProfileSnapshot createSnapshot(@PathVariable Long studentId,
-                                                 @RequestBody StudentProfileSnapshot snapshot) {
+                                                 @Valid @RequestBody StudentProfileSnapshot snapshot) {
         return service.createSnapshot(studentId, snapshot);
     }
 
     @PutMapping("/{id}")
     public StudentProfileSnapshot updateSnapshot(@PathVariable Long id,
-                                                 @RequestBody StudentProfileSnapshot snapshot) {
+                                                 @Valid @RequestBody StudentProfileSnapshot snapshot) {
         return service.updateSnapshot(id, snapshot);
     }
 

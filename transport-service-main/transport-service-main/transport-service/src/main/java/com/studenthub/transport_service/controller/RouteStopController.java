@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.transport_service.data.model.RouteStop;
 import com.studenthub.transport_service.service.RouteStopService;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,13 @@ public class RouteStopController {
 
     @PostMapping("/route/{routeId}")
     public RouteStop createStop(@PathVariable Long routeId,
-                                @RequestBody RouteStop stop) {
+                                @Valid @RequestBody RouteStop stop) {
         return service.createStop(routeId, stop);
     }
 
     @PutMapping("/{id}")
     public RouteStop updateStop(@PathVariable Long id,
-                                @RequestBody RouteStop stop) {
+                                @Valid @RequestBody RouteStop stop) {
         return service.updateStop(id, stop);
     }
 

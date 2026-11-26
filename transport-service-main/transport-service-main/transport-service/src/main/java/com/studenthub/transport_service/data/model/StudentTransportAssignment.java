@@ -1,6 +1,7 @@
 package com.studenthub.transport_service.data.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDate;
 
@@ -30,12 +31,17 @@ public class StudentTransportAssignment {
     private Vehicle vehicle;
 
     @Column(name = "pickup_point", nullable = false, length = 150)
+    @NotNull
+    @Size(max = 150)
     private String pickupPoint;
 
     @Column(name = "drop_point", nullable = false, length = 150)
+    @NotNull
+    @Size(max = 150)
     private String dropPoint;
 
     @Column(name = "effective_from", nullable = false)
+    @NotNull
     private LocalDate effectiveFrom;
 
     @Column(name = "effective_to")

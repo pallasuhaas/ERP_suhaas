@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.service;
 
+import com.studenthub.student_info_service.exception.ResourceNotFoundException;
 import com.studenthub.student_info_service.data.model.ContactInfo;
 import com.studenthub.student_info_service.data.model.Student;
 import com.studenthub.student_info_service.data.repository.ContactInfoRepository;
@@ -25,12 +26,12 @@ public class ContactInfoService {
 
     public ContactInfo getById(Long id) {
         return contactRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("ContactInfo not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("ContactInfo not found with id: " + id));
     }
 
     public ContactInfo createContactInfo(Long studentId, ContactInfo info) {
         Student student = studentRepo.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with id: " + studentId));
 
         info.setStudent(student);
         return contactRepo.save(info);

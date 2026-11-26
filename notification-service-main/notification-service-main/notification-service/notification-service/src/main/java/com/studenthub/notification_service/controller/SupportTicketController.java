@@ -1,5 +1,6 @@
 package com.studenthub.notification_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.notification_service.data.model.SupportTicket;
 import com.studenthub.notification_service.data.model.TicketReply;
 import com.studenthub.notification_service.data.model.TicketStatus;
@@ -36,8 +37,13 @@ public class SupportTicketController {
     }
 
     @PostMapping
-    public SupportTicket create(@RequestBody NewTicketRequest request) {
+    public SupportTicket create(@Valid @RequestBody NewTicketRequest request) {
         return service.create(request);
+    }
+
+    @PostMapping("/student/{studentId}")
+    public SupportTicket createForStudent(@PathVariable Long studentId, @Valid @RequestBody NewTicketRequest request) {
+        return service.createForStudent(studentId, request);
     }
 
     @GetMapping("/{ticketId}/replies")
@@ -46,7 +52,7 @@ public class SupportTicketController {
     }
 
     @PostMapping("/{ticketId}/replies")
-    public TicketReply addReply(@PathVariable Long ticketId, @RequestBody NewMessageRequest request) {
+    public TicketReply addReply(@PathVariable Long ticketId, @Valid @RequestBody NewMessageRequest request) {
         return service.addReply(ticketId, request);
     }
 

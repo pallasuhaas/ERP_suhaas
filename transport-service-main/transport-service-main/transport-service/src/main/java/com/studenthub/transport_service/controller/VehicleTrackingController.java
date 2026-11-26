@@ -1,5 +1,6 @@
 package com.studenthub.transport_service.controller;
 
+import jakarta.validation.Valid;
 import com.studenthub.transport_service.data.model.VehicleTracking;
 import com.studenthub.transport_service.service.VehicleTrackingService;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class VehicleTrackingController {
 
     @PostMapping
     public VehicleTracking createTracking(@RequestParam Long vehicleId,
-                                          @RequestBody VehicleTracking tracking) {
+                                          @Valid @RequestBody VehicleTracking tracking) {
         return service.createTracking(vehicleId, tracking);
     }
 

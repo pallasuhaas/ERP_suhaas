@@ -1,5 +1,6 @@
 package com.studenthub.student_info_service.controllers;
 
+import jakarta.validation.Valid;
 import com.studenthub.student_info_service.data.model.Student;
 import com.studenthub.student_info_service.data.model.StudentStatus;
 import com.studenthub.student_info_service.dto.BulkUploadResponse;
@@ -34,7 +35,7 @@ public class StudentController {
     }
 
     @PostMapping
-    public Student createStudent(@RequestBody Student student) {
+    public Student createStudent(@Valid @RequestBody Student student) {
         return service.createStudent(student);
     }
 
@@ -44,7 +45,7 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable Long id, @RequestBody Student student) {
+    public Student updateStudent(@PathVariable Long id, @Valid @RequestBody Student student) {
         return service.updateStudent(id, student);
     }
 
@@ -53,8 +54,9 @@ public class StudentController {
         return service.updateStatus(id, status);
     }
 
+    // BUG-010: archives an active student; permanently deletes an archived one if no other service references it
     @DeleteMapping("/{id}")
-    public void deleteStudent(@PathVariable Long id) {
-        service.deleteStudent(id);
+    public java.util.Map<String, Object> deleteStudent(@PathVariable Long id) {
+        return java.util.Map.of("studentId", id, "result", service.deleteStudent(id));
     }
 }

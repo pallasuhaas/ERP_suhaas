@@ -1,5 +1,7 @@
 package com.studenthub.notification_service.controller;
 
+import jakarta.validation.Valid;
+import com.studenthub.notification_service.data.model.ChatDepartment;
 import com.studenthub.notification_service.data.model.ChatMessage;
 import com.studenthub.notification_service.data.model.ChatThread;
 import com.studenthub.notification_service.dto.NewMessageRequest;
@@ -30,8 +32,19 @@ public class ChatController {
     }
 
     @PostMapping
-    public ChatThread createThread(@RequestBody NewThreadRequest request) {
+    public ChatThread createThread(@Valid @RequestBody NewThreadRequest request) {
         return service.createThread(request);
+    }
+
+    // Parent portal: get-or-create. department/subject accepted in the JSON body or as query params.
+    @PostMapping("/student/{studentId}")
+    public ChatThread getOrCreateThread(@PathVariable Long studentId,
+                                        @RequestParam(required = false) ChatDepartment department,
+                                        @RequestParam(required = false) String subject,
+                                        @Valid @RequestBody(required = false) NewThreadRequest body) {
+        ChatDepartment dept = department != null ? department : (body != null ? body.department() : null);
+        String subj = subject != null ? subject : (body != null ? body.subject() : null);
+        return service.getOrCreateThread(studentId, dept, subj);
     }
 
     @GetMapping("/{threadId}/messages")
@@ -40,7 +53,7 @@ public class ChatController {
     }
 
     @PostMapping("/{threadId}/messages")
-    public ChatMessage addMessage(@PathVariable Long threadId, @RequestBody NewMessageRequest request) {
+    public ChatMessage addMessage(@PathVariable Long threadId, @Valid @RequestBody NewMessageRequest request) {
         return service.addMessage(threadId, request);
     }
 
